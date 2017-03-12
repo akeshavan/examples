@@ -1,0 +1,55 @@
+.mode {
+     list-style-type:none;
+     margin:25px 0 0 0;
+     padding:0px;
+}
+
+.mode li {
+    float:left;
+    left: 25%;
+    margin:0 5px 5px 0;
+    width:100px;
+    height:40px;
+    position:relative;
+}
+
+.mode input {
+  width:95px;
+  height:34px;
+  border-radius: 5px;
+  outline: none;
+}
+
+.mode label, .mode input {
+    display:inline-block;
+    text-align: center;
+    vertical-align: middle;
+    position:absolute;
+    font-size: x-large;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+}
+
+.mode input[type="radio"] {
+    opacity:0.011;
+    z-index:100;
+}
+
+.mode input[type="radio"]:checked + label {
+    background:rgb(247, 182, 183);
+}
+
+.mode label {
+     padding:5px;
+     border:1px solid #CCC;
+     vertical-align: middle;
+     border-radius: 10px;
+     cursor:pointer;
+     z-index:90;
+}
+
+.mode label:hover {
+     background:#DDD;
+}

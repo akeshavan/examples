@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Load the Paper.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.10.3/paper-full.min.js"></script>
+<link href="buttons.css" rel="stylesheet"></link>
+<style type="text/css">
+html,
+body {
+    margin: 0;
+    overflow: hidden;
+    height: 100%;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+/* Scale canvas with resize attribute to full size */
+canvas[resize] {
+    width: 100%;
+    height: 100%;
+}
+</style>
+
+<!-- Define inlined PaperScript associate it with myCanvas -->
+
+<script type="text/paperscript" canvas="myCanvas" src="main.js">
+</script>
+
+</head>
+
+<body>
+  <div class="controls">
+    <ul class="mode">
+      <li>
+          <input type="radio" id="zoom" name="amount" onclick="changeMode('zoom')"/>
+          <label for="zoom">Zoom</label>
+      </li>
+      <li>
+          <input type="radio" id="pan" name="amount" onclick="changeMode('pan')" />
+          <label for="pan">Pan</label>
+      </li>
+      <li>
+          <input type="radio" id="paint" name="amount" checked="checked"
+          onclick="changeMode('paint')"/>
+          <label for="paint">Paint</label>
+      </li>
+      <li>
+          <input type="text" id="otherAmount"
+          name="numAmount" value="1"
+          width="100px"
+          onchange="setPaintbrush(this.value)"/>
+      </li>
+      <li>
+          <input type="radio" id="fill" name="amount"
+          onclick="changeMode('fill')"/>
+          <label for="fill">Fill</label>
+      </li>
+      <!--<li>
+          <input type="button" text="Undo" onclick="Undo()"
+            id="undo" name="amount" style="background-color:white; border:none;"/>
+          <label for="undo">Undo</label>
+      </li>-->
+
+    </ul>
+  </div>
+	<img src="brain.jpg" id="mona" hidden>
+	<canvas id="myCanvas" resize >
+
+  </canvas>
+</body>
+
+</html>
