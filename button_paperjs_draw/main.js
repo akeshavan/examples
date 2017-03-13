@@ -48,25 +48,26 @@ Raster.prototype.save_base_colors = function(){
 }
 
 Raster.prototype.set_brightness = function(value){
-	//if (value <= 1 || value >=0){
-
+/*
+	Set the brightness on the raster, based on value. Value is added to the
+	original brightness setting of the image. value +brightness will be clamped
+	between 0 and 1.
+*/
 		for (x=0;x<this.width;x++){
 			for (y=0;y<this.height;y++){
 
 				var newColor = this.base_colors[x][y].clone()
 				var oldBrightness = newColor.getBrightness()
-				//console.log(x,y,orig.getBrightness())
 				newColor.setBrightness(xfm.clamp(oldBrightness + value, 0, 1))
 				this.setPixel(x,y,newColor)
-				//console.log("now is", this.getPixel(x,y).getBrightness())
 			}
 		};
-
-	//}
 }
 
 Raster.prototype.set_contrast = function(value){
-	//if (value <= 1 || value >=0){
+/*
+	Set the contrast on the raster. value is between 0 and 255.
+*/
 
 		var adjust = function(r,f){
 			return f*(r-128)+128
@@ -85,16 +86,15 @@ Raster.prototype.set_contrast = function(value){
 				var newR = xfm.clamp(adjust(oldR, factor),0,255)/255
 				var newG = xfm.clamp(adjust(oldG, factor),0,255)/255
 				var newB = xfm.clamp(adjust(oldB, factor),0,255)/255
-				//console.log(x,y,orig.getBrightness())
+
 				newColor.setRed(newR)
 				newColor.setGreen(newG)
 				newColor.setBlue(newB)
 				this.setPixel(x,y,newColor)
-				//console.log("now is", this.getPixel(x,y).getBrightness())
+
 			}
 		};
 
-	//}
 }
 
 Raster.prototype.initPixelLog = function(){
@@ -239,14 +239,20 @@ draw.reset = function(){
 }
 
 draw.addHistory = function(x0,y0,oldval,newval){
+	/*
+		Add an item to history so we can revert. Save coordinates x0, y0,
+		and the oldval. Only save to history if there is a change (oldval != newval)
+	*/
 	if (oldval != newval){
 		draw.history[draw.history.length-1].push({x:x0, y:y0,
-																						prev:oldval,
-																						curr: newval})
+																						prev:oldval})
 	}
 }
 
 draw.revert = function(roi){
+	/*
+		Revert based on history
+	*/
 	if (draw.history.length > 1){
 		draw.history.pop() //this one is always empty
 		var values = draw.history.pop()
@@ -321,12 +327,17 @@ draw.floodFill = function(roi, node, targetVal, replacementVal){
 =============================================================================*/
 
 changeMode = function(e){
+	/*
+		Set the window's mode to e. e is a string. Examples "fill", "paint", etc
+	*/
 	window.mode = e
 }
 
 window.paintVal = 1
 setPaintbrush = function(e){
-
+	/*
+		Set paintbrush value to integer(e). If e is not in the draw.LUT, set to 0.
+	*/
 	if (Object.keys(draw.LUT).indexOf(e)<0){
 		console.log("value not in lookup table. setting paintbrush to 0")
 		e = 0
@@ -338,6 +349,9 @@ setPaintbrush = function(e){
 window.zoomFactor = 1
 
 doZoom = function(e){
+	/*
+		Zoom based on how far the user drags in the y direction
+	*/
 	var zoomFactor = window.zoomFactor + e.delta.y/200
 	window.zoomFactor = xfm.clamp(zoomFactor, 1, 3)
 	view.setZoom(window.zoomFactor)
@@ -347,6 +361,9 @@ window.panFactor = {x:0, y:0}
 window.totalPan = {x:0, y:0}
 
 doPan = function(e){
+	/*
+		Pan based on how far the user drags in the x/y direction
+	*/
 	window.panFactor.x = window.panFactor.x + e.delta.x/100
 	window.panFactor.y = window.panFactor.y + e.delta.y/100
 
@@ -357,18 +374,24 @@ doPan = function(e){
 }
 
 doBright = function(e){
+	/*
+		Adjust brightness based on how far left/right of the center is clicked.
+		Adjust contrast based on how far up/down of the center is clicked.
+	*/
 	var amount = xfm.get_local(e)
 	var half = all_rasters[0].width/2
 	amount.x = (amount.x - half)/half
 	amount.y = (amount.y - half)/half
 	console.log("amount is", amount)
-	//(e.event.x - view.getBounds().width/2)/(view.getBounds().width/2)
-	//console.log(e, amount)
+
 	all_rasters[0].set_brightness(amount.x)
 	all_rasters[0].set_contrast(amount.y*255)
 }
 
 dragHandler = function(e){
+	/*
+		What to do when the user drags based on the window.mode
+	*/
 	var me = this
 	var mode = window.mode
 	switch (mode) {
@@ -383,12 +406,14 @@ dragHandler = function(e){
 			break;
 
 		default:
-			//console.log("default")
 			break
 	}
 }
 
 clickHandler = function(e){
+	/*
+		What to do when the user clicks based on window.mode
+	*/
 	var me = this
 	var mode = window.mode
 	switch (mode) {
@@ -396,10 +421,10 @@ clickHandler = function(e){
 			doFloodFill(e, me)
 			break;
 		case "brightness":
-				doBright(e)
-				break
+			doBright(e)
+			break
 		default:
-			//console.log("default")
+			break
 
 	}
 }
