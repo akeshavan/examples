@@ -44,6 +44,8 @@
     z-index:100;
 }
 
+
+
 .mode input[type="radio"]:hover +label{
     background-color: #666666;
 }

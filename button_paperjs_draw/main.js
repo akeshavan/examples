@@ -85,6 +85,9 @@ function drawLine(e, me){
 	*/
 	var local = xfm.get_local(e)
 	//console.log("paintval to", draw.LUT[window.paintVal])
+	draw.addHistory(local.x, local.y,
+									me.pixelLog[local.x][local.y],
+									window.paintVal)
 	me.setPixelLog(local.x, local.y, draw.LUT[window.paintVal], window.paintVal)
 
   if (draw.last != null){
@@ -149,6 +152,7 @@ xfm.get_local = function(e){
 draw = {}
 draw.last = null
 draw.counter = 0
+draw.history = [[]]
 
 draw.LUT = {0: {red: 0, green:0, blue:0, alpha:0},
 					  1:"red",
@@ -166,7 +170,30 @@ draw.reset = function(){
   draw.counter = 0
 	window.panFactor.x = 0
 	window.panFactor.y = 0
+	if (draw.history[draw.history.length-1].length){
+	draw.history.push([])}
+	console.log("draw history", draw.history)
 
+}
+
+draw.addHistory = function(x0,y0,oldval,newval){
+	if (oldval != newval){
+		draw.history[draw.history.length-1].push({x:x0, y:y0,
+																						prev:oldval,
+																						curr: newval})
+	}
+}
+
+draw.revert = function(roi){
+	if (draw.history.length > 1){
+		draw.history.pop() //this one is always empty
+		var values = draw.history.pop()
+		values.forEach(function(val, idx, arr){
+			roi.setPixelLog(val.x,val.y,draw.LUT[val.prev], val.prev)
+		})
+		draw.history.push([])
+		console.log(draw.history)
+	}
 }
 
 draw.line = function(x0, y0, x1, y1, val, roi, paintVal){
@@ -182,6 +209,7 @@ draw.line = function(x0, y0, x1, y1, val, roi, paintVal){
 
    while(true){
 
+		 draw.addHistory(x0,y0,roi.pixelLog[x0][y0],paintVal)
      roi.setPixelLog(x0,y0, val, paintVal);  // Do what you need to for this
 
      if (Math.abs(x0-x1) < 0.25 && Math.abs(y0-y1) < 0.25) break;
@@ -215,8 +243,9 @@ draw.floodFill = function(roi, node, targetVal, replacementVal){
   if (node.y >= roi.height){return}
   if (node.y < 0){return}
 
-
+	draw.addHistory(node.x, node.y, roi.pixelLog[node.x][node.y], replacement_red)
 	roi.setPixelLog(node.x, node.y, draw.LUT[replacement_red], replacement_red)
+
   draw.counter++
 	draw.floodFill(roi, {x:node.x-1, y:node.y}, target_red, replacement_red)
 	draw.floodFill(roi, {x:node.x+1, y:node.y}, target_red, replacement_red)
