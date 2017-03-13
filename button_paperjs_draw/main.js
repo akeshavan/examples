@@ -65,6 +65,38 @@ Raster.prototype.set_brightness = function(value){
 	//}
 }
 
+Raster.prototype.set_contrast = function(value){
+	//if (value <= 1 || value >=0){
+
+		var adjust = function(r,f){
+			return f*(r-128)+128
+		}
+
+		for (x=0;x<this.width;x++){
+			for (y=0;y<this.height;y++){
+
+				var newColor = this.base_colors[x][y].clone()
+
+				var oldR = newColor.getRed()*255
+				var oldG = newColor.getGreen()*255
+				var oldB = newColor.getBlue()*255
+				var factor = (259*(value+255))/(255*(259-value))
+
+				var newR = xfm.clamp(adjust(oldR, factor),0,255)/255
+				var newG = xfm.clamp(adjust(oldG, factor),0,255)/255
+				var newB = xfm.clamp(adjust(oldB, factor),0,255)/255
+				//console.log(x,y,orig.getBrightness())
+				newColor.setRed(newR)
+				newColor.setGreen(newG)
+				newColor.setBlue(newB)
+				this.setPixel(x,y,newColor)
+				//console.log("now is", this.getPixel(x,y).getBrightness())
+			}
+		};
+
+	//}
+}
+
 Raster.prototype.initPixelLog = function(){
 	/*
 		Adds the pixelLog attribute to the raster. Pixel log is a dictionary with
@@ -325,9 +357,15 @@ doPan = function(e){
 }
 
 doBright = function(e){
-	var amount = (e.event.x - view.getBounds().width/2)/(view.getBounds().width/2)
+	var amount = xfm.get_local(e)
+	var half = all_rasters[0].width/2
+	amount.x = (amount.x - half)/half
+	amount.y = (amount.y - half)/half
+	console.log("amount is", amount)
+	//(e.event.x - view.getBounds().width/2)/(view.getBounds().width/2)
 	//console.log(e, amount)
-	all_rasters[0].set_brightness(amount)
+	all_rasters[0].set_brightness(amount.x)
+	all_rasters[0].set_contrast(amount.y*255)
 }
 
 dragHandler = function(e){
