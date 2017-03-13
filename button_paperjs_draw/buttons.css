@@ -13,12 +13,7 @@
     position:relative;
 }
 
-.mode input {
-  width:95px;
-  height:34px;
-  border-radius: 5px;
-  outline: none;
-}
+
 
 .mode label, .mode input {
     display:inline-block;
@@ -26,10 +21,22 @@
     vertical-align: middle;
     position:absolute;
     font-size: x-large;
+    color: white;
     top:0;
     left:0;
     right:0;
     bottom:0;
+}
+
+.mode input {
+  width:95px;
+  height:34px;
+  border-radius: 5px;
+  border-top-style: double;
+  border-left-style: double;
+  color: white;
+  background-color: black;
+  outline: none;
 }
 
 .mode input[type="radio"] {
@@ -37,8 +44,12 @@
     z-index:100;
 }
 
+.mode input[type="radio"]:hover +label{
+    background-color: #666666;
+}
+
 .mode input[type="radio"]:checked + label {
-    background:rgb(247, 182, 183);
+    background:steelblue;
 }
 
 .mode label {
@@ -51,5 +62,5 @@
 }
 
 .mode label:hover {
-     background:#DDD;
+     background:#666666;
 }
