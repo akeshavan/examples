@@ -204,10 +204,10 @@ draw.floodFill = function(roi, node, targetVal, replacementVal){
 
 	var node_red = roi.pixelLog[node.x][node.y] //.getPixel(node).red
 	//console.log("node res is", node_red, node.x, node.y)
-	var target_red = targetVal || 0
-	var replacement_red = replacementVal || 1
+	var target_red = targetVal //|| 0
+	var replacement_red = replacementVal //|| 1
 	if (target_red == replacement_red){
-		//console.log("target is replacement")
+		console.log("target is replacement", target_red, replacement_red)
 		return}
 	if (node_red != target_red){return}
   if (node.x >= roi.width){return}
@@ -245,7 +245,7 @@ setPaintbrush = function(e){
 		e = 0
 	}
 
-	window.paintVal = e
+	window.paintVal = parseInt(e)
 }
 
 window.zoomFactor = 1
