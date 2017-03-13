@@ -22,6 +22,8 @@ var initialize_base_raster = function(raster){
 	all_rasters.push(raster)
 }
 
+
+
 var initialize_roi_raster = function(base_raster, roi_raster, alpha){
 	/*
 		Initialize the roi image so that its the same size and position of the
@@ -33,6 +35,34 @@ var initialize_roi_raster = function(base_raster, roi_raster, alpha){
 	roi_raster.opacity = alpha //0.25
 	roi_raster.initPixelLog()
 	all_rasters.push(roi_raster)
+}
+
+Raster.prototype.save_base_colors = function(){
+	this.base_colors = {}
+	for (x=0;x<this.width;x++){
+		this.base_colors[x] = {}
+		for (y=0;y<this.height;y++){
+			this.base_colors[x][y] = this.getPixel(x,y)
+		}
+	}
+}
+
+Raster.prototype.set_brightness = function(value){
+	//if (value <= 1 || value >=0){
+
+		for (x=0;x<this.width;x++){
+			for (y=0;y<this.height;y++){
+
+				var newColor = this.base_colors[x][y].clone()
+				var oldBrightness = newColor.getBrightness()
+				//console.log(x,y,orig.getBrightness())
+				newColor.setBrightness(xfm.clamp(oldBrightness + value, 0, 1))
+				this.setPixel(x,y,newColor)
+				//console.log("now is", this.getPixel(x,y).getBrightness())
+			}
+		};
+
+	//}
 }
 
 Raster.prototype.initPixelLog = function(){
@@ -172,7 +202,7 @@ draw.reset = function(){
 	window.panFactor.y = 0
 	if (draw.history[draw.history.length-1].length){
 	draw.history.push([])}
-	console.log("draw history", draw.history)
+	//console.log("draw history", draw.history)
 
 }
 
@@ -262,10 +292,6 @@ changeMode = function(e){
 	window.mode = e
 }
 
-Undo = function(){
-	console.log("want to undo")
-}
-
 window.paintVal = 1
 setPaintbrush = function(e){
 
@@ -298,6 +324,12 @@ doPan = function(e){
 	view.translate(window.panFactor.x, window.panFactor.y)
 }
 
+doBright = function(e){
+	var amount = (e.event.x - view.getBounds().width/2)/(view.getBounds().width/2)
+	//console.log(e, amount)
+	all_rasters[0].set_brightness(amount)
+}
+
 dragHandler = function(e){
 	var me = this
 	var mode = window.mode
@@ -311,6 +343,7 @@ dragHandler = function(e){
 		case "pan":
 			doPan(e)
 			break;
+
 		default:
 			//console.log("default")
 			break
@@ -324,6 +357,9 @@ clickHandler = function(e){
 		case "fill":
 			doFloodFill(e, me)
 			break;
+		case "brightness":
+				doBright(e)
+				break
 		default:
 			//console.log("default")
 
@@ -337,6 +373,7 @@ clickHandler = function(e){
 //Load the base image
 var base = new Raster('mona');
 initialize_base_raster(base)
+base.save_base_colors()
 
 //Load the (blank) ROI image
 var roi = new Raster({});
