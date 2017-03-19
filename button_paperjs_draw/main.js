@@ -288,37 +288,37 @@ draw.line = function(x0, y0, x1, y1, val, roi, paintVal){
 
 }
 
+// test
+// test
 draw.floodFill = function(roi, node, targetVal, replacementVal){
   /*
-    Recursive flood fill algorithm. roi = roi raster object, node is an object
+    flood fill algorithm. roi = roi raster object, node is an object
     with keys x,y that refer to the raster-space pixels
   */
-  if(draw.counter > 5500){
-    // too close to stack limit
-    return}
+  if (targetVal == replacementVal){return}
+  if (roi.pixelLog[node.x][node.y] != targetVal){return}
+  var neighboors = function(node){
+    var nei = [];
+    if (node.x > 0){nei.push({x:node.x - 1, y:node.y})};
+    if (node.y > 0){nei.push({x:node.x, y:node.y - 1})};
+    if (node.x < roi.width - 1){nei.push({x:node.x + 1, y:node.y})};
+    if (node.y < roi.height - 1){nei.push({x:node.x, y:node.y + 1})};
+    return nei
+  }
 
-
-  var node_red = roi.pixelLog[node.x][node.y] //.getPixel(node).red
-  //console.log("node res is", node_red, node.x, node.y)
-  var target_red = targetVal //|| 0
-  var replacement_red = replacementVal //|| 1
-  if (target_red == replacement_red){
-    console.log("target is replacement", target_red, replacement_red)
-    return}
-  if (node_red != target_red){return}
-  if (node.x >= roi.width){return}
-  if (node.x < 0){return}
-  if (node.y >= roi.height){return}
-  if (node.y < 0){return}
-
-  draw.addHistory(node.x, node.y, roi.pixelLog[node.x][node.y], replacement_red)
-  roi.setPixelLog(node.x, node.y, draw.LUT[replacement_red], replacement_red)
-
-  draw.counter++
-  draw.floodFill(roi, {x:node.x-1, y:node.y}, target_red, replacement_red)
-  draw.floodFill(roi, {x:node.x+1, y:node.y}, target_red, replacement_red)
-  draw.floodFill(roi, {x:node.x, y:node.y-1}, target_red, replacement_red)
-  draw.floodFill(roi, {x:node.x, y:node.y+1}, target_red, replacement_red)
+  var stack = [node];
+  while (stack.length > 0) {
+    var node = stack.pop();
+    draw.addHistory(node.x, node.y, roi.pixelLog[node.x][node.y], replacementVal);
+    roi.setPixelLog(node.x, node.y, draw.LUT[replacementVal], replacementVal);
+    var nei = neighboors(node);
+    for (i = 0; i < nei.length; i++){
+      var n = nei[i]
+      if (roi.pixelLog[n.x][n.y] == targetVal) {
+        stack.push(n)
+      }
+    }  
+  }
   return
 }
 
