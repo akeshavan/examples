@@ -288,37 +288,51 @@ draw.line = function(x0, y0, x1, y1, val, roi, paintVal){
 
 }
 
+// test
+// test
 draw.floodFill = function(roi, node, targetVal, replacementVal){
   /*
-    Recursive flood fill algorithm. roi = roi raster object, node is an object
+    flood fill algorithm. roi = roi raster object, node is an object
     with keys x,y that refer to the raster-space pixels
   */
-  if(draw.counter > 5500){
-    // too close to stack limit
-    return}
+  if (targetVal == replacementVal){return}
+  if (roi.pixelLog[node.x][node.y] != targetVal){return}
+  var neighboors = function(y){
+    var nei = [];
+    if (y > 0) {nei.push(y - 1)}
+    if (y < roi.height - 1) {nei.push(y + 1)}
+    return nei
+  }
 
+  var cnt = 0;
+  var stack = [node]
+  while (stack.length > 0) {
+    // cnt += 1;
+    node = stack.pop();
+    var x = node.x;
+    var y = node.y;
+    // console.log(cnt, x, y);
+    // console.log(x, y);
+    if (roi.pixelLog[x][y] != targetVal) {continue}
 
-  var node_red = roi.pixelLog[node.x][node.y] //.getPixel(node).red
-  //console.log("node res is", node_red, node.x, node.y)
-  var target_red = targetVal //|| 0
-  var replacement_red = replacementVal //|| 1
-  if (target_red == replacement_red){
-    console.log("target is replacement", target_red, replacement_red)
-    return}
-  if (node_red != target_red){return}
-  if (node.x >= roi.width){return}
-  if (node.x < 0){return}
-  if (node.y >= roi.height){return}
-  if (node.y < 0){return}
+    while (x > 0 && roi.pixelLog[x - 1][y] == targetVal) {
+      x -= 1;
+    }
 
-  draw.addHistory(node.x, node.y, roi.pixelLog[node.x][node.y], replacement_red)
-  roi.setPixelLog(node.x, node.y, draw.LUT[replacement_red], replacement_red)
-
-  draw.counter++
-  draw.floodFill(roi, {x:node.x-1, y:node.y}, target_red, replacement_red)
-  draw.floodFill(roi, {x:node.x+1, y:node.y}, target_red, replacement_red)
-  draw.floodFill(roi, {x:node.x, y:node.y-1}, target_red, replacement_red)
-  draw.floodFill(roi, {x:node.x, y:node.y+1}, target_red, replacement_red)
+    var nei = neighboors(y);
+    while (x < (roi.width - 1) && roi.pixelLog[x][y] == targetVal) {
+      draw.addHistory(x, y, roi.pixelLog[x][y], replacementVal);
+      roi.setPixelLog(x, y, draw.LUT[replacementVal], replacementVal);
+      for (i = 0; i < nei.length; i++){
+        var y_nei = nei[i]
+        if (roi.pixelLog[x][y_nei] == targetVal) {
+          stack.push({x:x,y:y_nei})
+        }
+      }
+      x += 1;
+      // cnt += 1;
+    }
+  }
   return
 }
 
