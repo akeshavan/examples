@@ -297,12 +297,10 @@ draw.floodFill = function(roi, node, targetVal, replacementVal){
   */
   if (targetVal == replacementVal){return}
   if (roi.pixelLog[node.x][node.y] != targetVal){return}
-  var neighboors = function(x, y){
+  var neighboors = function(y){
     var nei = [];
-    // if (node.x > 0){nei.push({x:node.x - 1, y:node.y})};
-    if (y > 0){nei.push({x:x, y:y - 1})};
-    // if (node.x < roi.width - 1){nei.push({x:node.x + 1, y:node.y})};
-    if (y < roi.height - 1){nei.push({x:x, y:y + 1})};
+    if (y > 0) {nei.push(y - 1)}
+    if (y < roi.height - 1) {nei.push(y + 1)}
     return nei
   }
 
@@ -320,14 +318,15 @@ draw.floodFill = function(roi, node, targetVal, replacementVal){
     while (x > 0 && roi.pixelLog[x - 1][y] == targetVal) {
       x -= 1;
     }
+
+    var nei = neighboors(y);
     while (x < (roi.width - 1) && roi.pixelLog[x][y] == targetVal) {
       draw.addHistory(x, y, roi.pixelLog[x][y], replacementVal);
       roi.setPixelLog(x, y, draw.LUT[replacementVal], replacementVal);
-      var nei = neighboors(x, y);
       for (i = 0; i < nei.length; i++){
-        var n = nei[i]
-        if (roi.pixelLog[n.x][n.y] == targetVal) {
-          stack.push(n)
+        var y_nei = nei[i]
+        if (roi.pixelLog[x][y_nei] == targetVal) {
+          stack.push({x:x,y:y_nei})
         }
       }
       x += 1;
