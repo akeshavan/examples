@@ -297,27 +297,42 @@ draw.floodFill = function(roi, node, targetVal, replacementVal){
   */
   if (targetVal == replacementVal){return}
   if (roi.pixelLog[node.x][node.y] != targetVal){return}
-  var neighboors = function(node){
+  var neighboors = function(x, y){
     var nei = [];
-    if (node.x > 0){nei.push({x:node.x - 1, y:node.y})};
-    if (node.y > 0){nei.push({x:node.x, y:node.y - 1})};
-    if (node.x < roi.width - 1){nei.push({x:node.x + 1, y:node.y})};
-    if (node.y < roi.height - 1){nei.push({x:node.x, y:node.y + 1})};
+    // if (node.x > 0){nei.push({x:node.x - 1, y:node.y})};
+    if (y > 0){nei.push({x:x, y:y - 1})};
+    // if (node.x < roi.width - 1){nei.push({x:node.x + 1, y:node.y})};
+    if (y < roi.height - 1){nei.push({x:x, y:y + 1})};
     return nei
   }
 
-  var stack = [node];
+  var cnt = 0;
+  var stack = [node]
   while (stack.length > 0) {
-    var node = stack.pop();
-    draw.addHistory(node.x, node.y, roi.pixelLog[node.x][node.y], replacementVal);
-    roi.setPixelLog(node.x, node.y, draw.LUT[replacementVal], replacementVal);
-    var nei = neighboors(node);
-    for (i = 0; i < nei.length; i++){
-      var n = nei[i]
-      if (roi.pixelLog[n.x][n.y] == targetVal) {
-        stack.push(n)
+    // cnt += 1;
+    node = stack.pop();
+    var x = node.x;
+    var y = node.y;
+    // console.log(cnt, x, y);
+    // console.log(x, y);
+    if (roi.pixelLog[x][y] != targetVal) {continue}
+
+    while (x > 0 && roi.pixelLog[x - 1][y] == targetVal) {
+      x -= 1;
+    }
+    while (x < (roi.width - 1) && roi.pixelLog[x][y] == targetVal) {
+      draw.addHistory(x, y, roi.pixelLog[x][y], replacementVal);
+      roi.setPixelLog(x, y, draw.LUT[replacementVal], replacementVal);
+      var nei = neighboors(x, y);
+      for (i = 0; i < nei.length; i++){
+        var n = nei[i]
+        if (roi.pixelLog[n.x][n.y] == targetVal) {
+          stack.push(n)
+        }
       }
-    }  
+      x += 1;
+      // cnt += 1;
+    }
   }
   return
 }
