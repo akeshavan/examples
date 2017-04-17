@@ -125,8 +125,18 @@ Raster.prototype.setPixelLog = function(x,y,val,paintVal){
     return 0
   }
   catch(err){
-    console.log(x,y,"out of bounds")
+    //console.log(x,y,"out of bounds")
     return 1
+  }
+}
+
+Raster.prototype.fillPixelLog = function(obj,color_mapper){
+  for (ii in obj){
+    for (jj in obj[ii]){
+      var val = obj[ii][jj]
+      var color = color_mapper[val]
+      this.setPixelLog(ii,jj,color, val)
+    }
   }
 }
 
@@ -288,8 +298,6 @@ draw.line = function(x0, y0, x1, y1, val, roi, paintVal){
 
 }
 
-// test
-// test
 draw.floodFill = function(roi, node, targetVal, replacementVal){
   /*
     flood fill algorithm. roi = roi raster object, node is an object
@@ -352,6 +360,7 @@ setPaintbrush = function(e){
   /*
     Set paintbrush value to integer(e). If e is not in the draw.LUT, set to 0.
   */
+  console.log("setting paintbrush value", e)
   if (Object.keys(draw.LUT).indexOf(e)<0){
     console.log("value not in lookup table. setting paintbrush to 0")
     e = 0
@@ -402,6 +411,18 @@ doBright = function(e){
   all_rasters[0].set_contrast(amount.y*255)
 }
 
+hide = function(){
+  all_rasters[1].visible = !all_rasters[1].visible
+  if (all_rasters[1].visible){
+    $("#show").show()
+    $("#noshow").hide()
+  }
+  else{
+    $("#noshow").show()
+    $("#show").hide()
+  }
+}
+
 dragHandler = function(e){
   /*
     What to do when the user drags based on the window.mode
@@ -448,23 +469,27 @@ clickHandler = function(e){
 ==============================================================================*/
 
 //Load the base image
-var base = new Raster('mona');
-initialize_base_raster(base)
-base.save_base_colors()
+var base = new Raster('http://localhost:8000/brain.jpg');
+base.onLoad = function() {
+  initialize_base_raster(base)
+  base.save_base_colors()
 
-//Load the (blank) ROI image
-var roi = new Raster({});
-initialize_roi_raster(base, roi)
+  //Load the (blank) ROI image
+  var roi = new Raster({});
+  initialize_roi_raster(base, roi)
+  $.getJSON("mask.json", function(data){
+    roi.fillPixelLog(data, draw.LUT)
+  })
+  // ROI events
+  roi.onMouseDrag = dragHandler //drawLine
+  roi.onMouseUp = draw.reset
+  roi.onClick = clickHandler //doFloodFill
 
-// ROI events
-roi.onMouseDrag = dragHandler //drawLine
-roi.onMouseUp = draw.reset
-roi.onClick = clickHandler //doFloodFill
+  //default mode:
+  window.mode = "paint"
 
-//default mode:
-window.mode = "paint"
-
-//DEBUG: Set some global variables
-window.base = base
-window.roi = roi
-window.view = view
+  //DEBUG: Set some global variables
+  window.base = base
+  window.roi = roi
+  window.view = view
+};
