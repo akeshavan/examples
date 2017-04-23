@@ -48,16 +48,19 @@ canvas[resize] {
       </li>
       <li>
           <input type="radio" id="paint" name="amount" checked="checked"
-          onclick="changeMode('paint')"/>
+          onclick="setPaintbrush('1');changeMode('paint')"/>
           <label for="paint">
             <img class="icon icons8-Pencil" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABu0lEQVR4XuXYa3LCMAxG0Xhl7VJgZS0rDWMGM6XkIcufnuYvZMg9VZOIsgR+ret6WZblq5Ry5WYU7oHWxz3jf57n8ctFCAnwL779LVgI4QB24tkIoQBO4lkIYQCI8d0IIQA647sQ3AMw48kI2QEqxOHdwT1ALRicgkOEEACSCGEApBBCAUgghANAI4QEQCKEBYAhWK61iH1+8BZ5M5sA1D4/MAm3UsrFBAC5z7cJ7pyER3w9Vh0Avc///RcmIrzi1QGIJ8j6ZYc4CW/xqgDEePIWd3Tx3vmuj3g1gM54CYTNeBUAZjwS4btd8LamRvQiOBgPQTh7zhEDAMWLI4gAgONFEeAAQvFiCFAA4XgRBBiAUjwcAQKgHA9FGAYwiochDAEYx1eE3Se8s/t/e58NkCGe/SicJZ4FkCm+GyBbfBdAxngyQNZ4EkDm+FOA7PGHADPE7wLMEr8JMFP8B8Bs8W8AM8a/AGaNfwDMHN8AVuruLPC54X1+9JzqBFgBmMdbToCLeCsAN/EWAK7itQHcxWsCuIzXAnAbrwHgOl4awH28JECIeCmAMPESAKHi0QDh4pEAIeNRAGHjK8AdxlNkiWihr1AAAAAASUVORK5CYII=" width="25" height="25">
           </label>
       </li>
       <li>
-          <input type="text" id="otherAmount"
-          name="numAmount" value="1"
-          width="100px"
-          onclick="setPaintbrush(this.value)"/>
+        <input type="radio" id="erase" name="amount"
+        onclick="setPaintbrush('0');changeMode('erase')"/>
+        <label for="erase">
+          <img class="icon icons8-Eraser" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAD70lEQVR4Xu1b7XEVMQyUKoAOCBUAFRAqACogVEBSAVABSQWQCggVABVAKiB0ABWI2Rk/5ube2Vr7/HGZF8/kV3S2tdHKWtlROfChB+6/3AFwFwEbRMDM7ovIcxF5HH6+iciNql7W3u7mKGBmL0Tko4gAhPn4KSJnqgpAqoxNAWBmJ8F5z7lTVb3wjJjfbwYAMzsWka/MpoPNlYi8VtU/Gd/smW4CgMD5X5GwT/l3IyIvVRXUKBpbAeBHSHYlTiACkBc+lXw8HAAzOxeRNyWbn30DAABEFiWGAhAy/ucKzu+mABVACVCDGsMAMDOc8Uh6S8cdtfmIESIAyRFJ0h1DAAhJD84DhFbjXFXPvMlHAYBCB2d+6/FeVd+lFukOQEaxUwuch6mc0BWAwHsceT3HhaqexhbsBkDgPZw/6um9iHxXVVSZi6MnADjuIHR6j/EAmBkS0dvenof1xgJQIHJq45Q8CZpSwMzAd/C+drHDgvQXtcawU8DM1ogc1smUHbQBtEZ0NIuAiiKnFIhLVXWLrSYADCh25iBdi8gxowyrA9BQ5LCRAN7DeapJUhWATiLHAwJKkG6O1Aagl8iJgZAse5c+qgaAmaHe/uD9eRr+/lpVs+V1FQAGiZwplu5530wLDBQ5U5+elV6WrI4AM0NnJ6q2Gob8bmq36dGsEBoscuBXUugw4BdHQIOOLrPfqc3vUOdntcHnixQBsAGRAz+esMVOdQpsQORkFTtVATCz0cUOJXJYPmVR4DaJnOoA3DaRUxWAjYgc3PlR112s87CjKGBmsY4ujqIHOQsW2maLHHYdF4CIyPmfiELTE22nR+yimXZFIoddIwlA5Lzfy8KBIgDhFbswaQeRc8R0dsj59sw8AOaPF5KtpgaSuFjksIB4AOA52tPJZO6GwmmBZLU2N6wSOU0AUFU3Z2DhQAmAMAWP3RPsvqhql2u03AjIqr8L1WIVkcOi7QEwzwHotIIGtAILpwSi4R6xqayOLjGfa+IBgKstvN+bDjiPooR+rhpOE4DgHZXVRI7reTBwOZ0I4+znqmaGCIqBUFXkVAMgJLXYW76s56qJm2L6Jod1jLVzI2A3UegA4cJhzmX6uWoEgOKOLutkyo4GIEQCcsISl6nnqhE6NRE5LDhZAEzO+FjZG32uGukhNhM5zQCYUAJXzwBiTom956qRXsLqji7rZDUKzCdKlL2gBK7KkB/wOgSRMX0l0lzksOBkU2ABhJ2D+B8fdriagp1ord1qACaUYC9Huxc7zSiwEA24Ios1RxD2Jy3aWmuioFoETDcRusc4MgEIkiJ+rnI0xBqncr5tAkDOBkbb3gEw+i8wev2Dj4B/SnGBULIrD5gAAAAASUVORK5CYII="
+          width="30" height="30">
+          
+        </label>
       </li>
       <li>
           <input type="radio" id="fill" name="amount"
