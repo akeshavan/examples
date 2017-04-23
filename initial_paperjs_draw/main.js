@@ -469,7 +469,7 @@ clickHandler = function(e){
 ==============================================================================*/
 
 //Load the base image
-var base = new Raster('http://localhost:8000/brain.jpg');
+var base = new Raster('brain.jpg');
 base.onLoad = function() {
   initialize_base_raster(base)
   base.save_base_colors()
