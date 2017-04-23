@@ -353,6 +353,13 @@ changeMode = function(e){
     Set the window's mode to e. e is a string. Examples "fill", "paint", etc
   */
   window.mode = e
+  if (e=="brightness"){
+    startBright()
+  }
+  else{
+    endBright()
+  }
+
 }
 
 window.paintVal = 1
@@ -381,34 +388,49 @@ doZoom = function(e){
 }
 
 window.panFactor = {x:0, y:0}
-window.totalPan = {x:0, y:0}
 
 doPan = function(e){
   /*
     Pan based on how far the user drags in the x/y direction
   */
-  window.panFactor.x = window.panFactor.x + e.delta.x/100
-  window.panFactor.y = window.panFactor.y + e.delta.y/100
 
-  window.totalPan.x = window.totalPan.x + e.delta.x/100
-  window.totalPan.y = window.totalPan.y + e.delta.y/100
+  window.panFactor.x = e.point.x - window.panMouseDown.point.x
+  window.panFactor.y = e.point.y - window.panMouseDown.point.y
 
   view.translate(window.panFactor.x, window.panFactor.y)
 }
+
+window.brightCirclePos = new Point(view.viewSize.width/2, view.viewSize.height/2);
+window.brightCircle = null
 
 doBright = function(e){
   /*
     Adjust brightness based on how far left/right of the center is clicked.
     Adjust contrast based on how far up/down of the center is clicked.
   */
+  console.log("setting brightness")
   var amount = xfm.get_local(e)
+  window.brightCircle.position = e.point
+  window.brightCirclePos = e.point
   var half = all_rasters[0].width/2
+  console.log(amount, "half is", half)
+
+
   amount.x = (amount.x - half)/half
   amount.y = (amount.y - half)/half
   console.log("amount is", amount)
 
   all_rasters[0].set_brightness(amount.x)
   all_rasters[0].set_contrast(amount.y*255)
+}
+
+startBright = function(){
+  window.brightCircle = new Path.Circle(window.brightCirclePos, 10);
+  window.brightCircle.fillColor = 'steelblue';
+}
+
+endBright = function(){
+  window.brightCircle.remove()
 }
 
 hide = function(){
@@ -431,6 +453,9 @@ dragHandler = function(e){
   var mode = window.mode
   switch (mode) {
     case "paint":
+      drawLine(e, me)
+      break
+    case "erase":
       drawLine(e, me)
       break
     case "zoom":
@@ -464,12 +489,34 @@ clickHandler = function(e){
   }
 }
 
+mousedownHandler = function(e){
+  /*
+    What to do when the user mouses down based on window.mode
+  */
+  var me = this
+  var mode = window.mode
+  switch (mode) {
+    case "pan":
+      window.panMouseDown = e
+      break;
+    case "paint":
+      setPaintbrush("1")
+      break
+    case "erase":
+      setPaintbrush("0")
+      break
+    default:
+      break
+
+  }
+}
+
 /* =============================================================================
                                     MAIN
 ==============================================================================*/
 
 //Load the base image
-var base = new Raster('http://localhost:8000/brain.jpg');
+var base = new Raster('brain.jpg');
 base.onLoad = function() {
   initialize_base_raster(base)
   base.save_base_colors()
@@ -481,9 +528,17 @@ base.onLoad = function() {
     roi.fillPixelLog(data, draw.LUT)
   })
   // ROI events
-  roi.onMouseDrag = dragHandler //drawLine
+  roi.onMouseDrag = dragHandler
+  roi.onMouseDown = mousedownHandler
   roi.onMouseUp = draw.reset
-  roi.onClick = clickHandler //doFloodFill
+  roi.onClick = clickHandler
+
+  // base events if ROI is hidden
+  base.onClick = function(e){
+    if (window.mode=="brightness"){
+      doBright(e)
+    }
+  }
 
   //default mode:
   window.mode = "paint"
