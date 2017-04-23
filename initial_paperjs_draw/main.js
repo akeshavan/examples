@@ -381,17 +381,14 @@ doZoom = function(e){
 }
 
 window.panFactor = {x:0, y:0}
-window.totalPan = {x:0, y:0}
 
 doPan = function(e){
   /*
     Pan based on how far the user drags in the x/y direction
   */
-  window.panFactor.x = window.panFactor.x + e.delta.x/100
-  window.panFactor.y = window.panFactor.y + e.delta.y/100
 
-  window.totalPan.x = window.totalPan.x + e.delta.x/100
-  window.totalPan.y = window.totalPan.y + e.delta.y/100
+  window.panFactor.x = e.point.x - window.panMouseDown.point.x
+  window.panFactor.y = e.point.y - window.panMouseDown.point.y
 
   view.translate(window.panFactor.x, window.panFactor.y)
 }
@@ -482,6 +479,7 @@ base.onLoad = function() {
   })
   // ROI events
   roi.onMouseDrag = dragHandler //drawLine
+  roi.onMouseDown = function(e){ if (window.mode == "pan"){window.panMouseDown = e}}
   roi.onMouseUp = draw.reset
   roi.onClick = clickHandler //doFloodFill
 
