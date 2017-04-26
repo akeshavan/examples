@@ -11,14 +11,33 @@ view.onResize = function(){
   all_rasters.map(function(r){r.fitBounds(view.bounds)})
 }
 
+function copyImageData(ctx, src)
+{
+    var dst = ctx.createImageData(src.width, src.height);
+    dst.data.set(src.data);
+    return dst;
+}
+
 var initialize_base_raster = function(raster){
   /*
     Initialize the base image raster so that its visible, centered, and takes up
-    the width of the window
+    the width of the window.
+
+    Also make a copy of it to save as the original image so we can manipulate
+    brightness and contrast
   */
   raster.visible = true;
   raster.position = view.center;
   raster.fitBounds(view.bounds);
+
+  var tmpCanvas = document.createElement('canvas');
+	tmpCanvas.width = raster.width;
+	tmpCanvas.height = raster.height;
+  var tmpCtx = tmpCanvas.getContext("2d")
+
+  raster.origImg = copyImageData(tmpCtx,
+    raster.canvas.getContext("2d").getImageData(0,0,raster.width, raster.height))
+
   all_rasters.push(raster)
 }
 
@@ -37,65 +56,7 @@ var initialize_roi_raster = function(base_raster, roi_raster, alpha){
   all_rasters.push(roi_raster)
 }
 
-Raster.prototype.save_base_colors = function(){
-  this.base_colors = {}
-  for (x=0;x<this.width;x++){
-    this.base_colors[x] = {}
-    for (y=0;y<this.height;y++){
-      this.base_colors[x][y] = this.getPixel(x,y)
-    }
-  }
-}
 
-Raster.prototype.set_brightness = function(value){
-/*
-  Set the brightness on the raster, based on value. Value is added to the
-  original brightness setting of the image. value +brightness will be clamped
-  between 0 and 1.
-*/
-    for (x=0;x<this.width;x++){
-      for (y=0;y<this.height;y++){
-
-        var newColor = this.base_colors[x][y].clone()
-        var oldBrightness = newColor.getBrightness()
-        newColor.setBrightness(xfm.clamp(oldBrightness + value, 0, 1))
-        this.setPixel(x,y,newColor)
-      }
-    };
-}
-
-Raster.prototype.set_contrast = function(value){
-/*
-  Set the contrast on the raster. value is between 0 and 255.
-*/
-
-    var adjust = function(r,f){
-      return f*(r-128)+128
-    }
-
-    for (x=0;x<this.width;x++){
-      for (y=0;y<this.height;y++){
-
-        var newColor = this.base_colors[x][y].clone()
-
-        var oldR = newColor.getRed()*255
-        var oldG = newColor.getGreen()*255
-        var oldB = newColor.getBlue()*255
-        var factor = (259*(value+255))/(255*(259-value))
-
-        var newR = xfm.clamp(adjust(oldR, factor),0,255)/255
-        var newG = xfm.clamp(adjust(oldG, factor),0,255)/255
-        var newB = xfm.clamp(adjust(oldB, factor),0,255)/255
-
-        newColor.setRed(newR)
-        newColor.setGreen(newG)
-        newColor.setBlue(newB)
-        this.setPixel(x,y,newColor)
-
-      }
-    };
-
-}
 
 Raster.prototype.initPixelLog = function(){
   /*
@@ -139,6 +100,51 @@ Raster.prototype.fillPixelLog = function(obj,color_mapper){
     }
   }
 }
+
+// Thanks https://github.com/licson0729/CanvasEffects
+
+Raster.prototype.process = function(func) {
+
+  var pix = copyImageData(this.getContext("2d"), this.origImg)
+
+  //Loop through the pixels
+  for (var x = 0; x < this.width; x++) {
+    for (var y = 0; y < this.height; y++) {
+      var i = (y * this.width + x) * 4;
+      var r = pix.data[i],
+        g = pix.data[i + 1],
+        b = pix.data[i + 2],
+        a = pix.data[i + 3];
+      var ret = func(r, g, b, a, x, y);
+      pix.data[i] = ret[0];
+      pix.data[i + 1] = ret[1];
+      pix.data[i + 2] = ret[2];
+      pix.data[i + 3] = ret[3];
+    }
+  }
+
+  this.setImageData(pix)
+
+}
+
+
+Raster.prototype.contrast = function(bright, level) {
+
+  var self = this;
+  level = Math.pow((level + 100) / 100, 2);
+  return this.process(function(r, g, b, a) {
+    return [((r / 255 - 0.5) * level + 0.5) * 255 * bright,
+            ((g / 255 - 0.5) * level + 0.5) * 255 * bright,
+            ((b / 255 - 0.5) * level + 0.5) * 255 * bright, a];
+  });
+}
+
+
+
+
+/* =============================================================================
+                          Filling and Painting FUNCTIONS
+============================================================================= */
 
 function doFloodFill(e, me){
   /*
@@ -355,14 +361,13 @@ changeMode = function(e){
   /*
     Set the window's mode to e. e is a string. Examples "fill", "paint", etc
   */
-  if (e=="brightness"){
+  if (e=="brightness" && window.mode != "brightness"){
     startBright()
   }
-  else if (window.mode == "brightness"){
+  else if (window.mode == "brightness" && e != "brightness"){
     endBright()
   }
   window.mode = e
-
 
 }
 
@@ -412,27 +417,38 @@ doBright = function(e){
     Adjust brightness based on how far left/right of the center is clicked.
     Adjust contrast based on how far up/down of the center is clicked.
   */
-  console.log("setting brightness")
+  //console.log("setting brightness")
   var amount = xfm.get_local(e)
   window.brightCircle.position = e.point
   window.brightCirclePos = e.point
   var half = all_rasters[0].width/2
-  console.log(amount, "half is", half)
+
+  //console.log(amount, "half is", half)
 
 
-  amount.x = (amount.x - half)/half
-  amount.y = (amount.y - half)/half
-  console.log("amount is", amount)
+  amount.x = (((amount.x - half)/half) +1 )
+  amount.y = (amount.y - half)/half * 100
+  //console.log("amount is", amount)
 
-  all_rasters[0].set_brightness(amount.x)
-  all_rasters[0].set_contrast(amount.y*255)
+
+  //var start = new Date().getTime();
+
+  all_rasters[0].contrast(amount.x, amount.y)
+  //all_rasters[0].contrast(amount.y)
+
+  //all_rasters[0].set_brightness_contrast(amount.x, amount.y*255)
+  //var end = new Date().getTime();
+  //var time = end - start;
+  //console.log('Execution time: ' + time);
+
+
+
 }
 
 startBright = function(){
-  if (!window.brightCircle){
-    window.brightCircle = new Path.Circle(window.brightCirclePos, 10);
-    window.brightCircle.fillColor = 'steelblue';
-  }
+  window.brightCircle = new Path.Circle(window.brightCirclePos, 10);
+  window.brightCircle.fillColor = 'steelblue';
+  window.brightCircle.onMouseDrag = doBright
 }
 
 endBright = function(){
@@ -456,6 +472,13 @@ dragHandler = function(e){
   /*
     What to do when the user drags based on the window.mode
   */
+
+  if (e.event.button == 2){
+    //right click and drag
+    doPan(e)
+    return
+  }
+
   var me = this
   var mode = window.mode
   switch (mode) {
@@ -481,6 +504,10 @@ clickHandler = function(e){
   /*
     What to do when the user clicks based on window.mode
   */
+ //console.log(e.event.button)
+
+
+
   var me = this
   var mode = window.mode
   switch (mode) {
@@ -502,6 +529,12 @@ mousedownHandler = function(e){
   */
   var me = this
   var mode = window.mode
+
+  if (e.event.button == 2){
+    //right click and drag
+    window.panMouseDown = e
+  }
+
   switch (mode) {
     case "pan":
       window.panMouseDown = e
@@ -518,20 +551,31 @@ mousedownHandler = function(e){
   }
 }
 
+function mousewheel( event ) {
+
+  event.preventDefault();
+  event.stopPropagation();
+  event.delta = {}
+  event.delta.y = event.deltaY
+  doZoom(event)
+
+}
+
+onmousewheel = mousewheel
+
 /* =============================================================================
                                     MAIN
 ==============================================================================*/
 
 //Load the base image
-var base = new Raster('http://localhost:8000/outputs/mse2441/cor_slice100.jpg');
+var base = new Raster('brain.jpg');
 base.onLoad = function() {
   initialize_base_raster(base)
-  base.save_base_colors()
 
   //Load the (blank) ROI image
   var roi = new Raster({});
   initialize_roi_raster(base, roi)
-  $.getJSON("http://localhost:8000/outputs/mse2441/cor_slice100.json", function(data){
+  $.getJSON("mask.json", function(data){
     roi.fillPixelLog(data, draw.LUT)
   })
   // ROI events
