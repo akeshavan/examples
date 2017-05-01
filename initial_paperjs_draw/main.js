@@ -162,6 +162,7 @@ function drawLine(e, me){
     Draws a line from e.point to the previous point
   */
   var local = xfm.get_local(e)
+
   //console.log("paintval to", draw.LUT[window.paintVal])
   draw.addHistory(local.x, local.y,
                   me.pixelLog[local.x][local.y],
@@ -196,14 +197,14 @@ xfm.clamp = function(number, min, max){
 
 }
 
-xfm.clampPoint = function(point, min, max){
+xfm.clampPoint = function(point, min, max, minh, maxh){
   /*
     returns a Point w/ point.x and point.y clamped between min,max
   */
   min = min || 0
   max = max || 0
   return new Point({x: xfm.clamp(point.x, min,max),
-    y: xfm.clamp(point.y, min, max)})
+    y: xfm.clamp(point.y, minh, maxh)})
 
 }
 
@@ -215,11 +216,13 @@ xfm.get_local = function(e){
     refence space.
   */
   var width = base.size.width
-  var half = width / 2
+  var height = base.size.height
+  var half_w = width / 2
+  var half_h = height / 2
   var local = base.globalToLocal(e.point)
-  var local = xfm.clampPoint(local, 0-half, half)
-  local.x =  Math.floor(local.x+half)
-  local.y = Math.floor(local.y+half)
+  var local = xfm.clampPoint(local, 0-half_w, half_w, 0-half_h, half_h)
+  local.x =  Math.floor(local.x+half_w)
+  local.y = Math.floor(local.y+half_h)
   return local
 }
 
@@ -358,7 +361,6 @@ changeMode = function(e){
   /*
     Set the window's mode to e. e is a string. Examples "fill", "paint", etc
   */
-
   if (e=="brightness" && window.mode != "brightness"){
     startBright()
   }
@@ -451,6 +453,7 @@ startBright = function(){
 
 endBright = function(){
   window.brightCircle.remove()
+  window.brightCircle = null
 }
 
 hide = function(){
