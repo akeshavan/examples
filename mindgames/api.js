@@ -1,0 +1,97 @@
+
+do_eval = function(){
+  var data = currentData
+  $.getJSON(data._items[0].truth_data, function(truth){
+    var cscore = roi.diff(truth)
+    var profile = store.get("github_profile")
+    var score = {"name": profile.login, "edit_data_id": [data._items[0]._id]}
+    score["xp"] = cscore.tp - cscore.fn - cscore.fp
+    score["accuracy"] = score.xp/(cscore.tp + cscore.fn + cscore.fp)
+    console.log("score is", score)
+    do_save(score, JSON.stringify(roi.pixelLog))
+  })
+}
+
+function create_request(data, url){
+  var form = new FormData();
+  for (key in data){
+    form.append(key, data[key])
+  }
+  var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": url,
+    "method": "POST",
+    "headers": {
+      "cache-control": "no-cache"
+    },
+    "processData": false,
+    "contentType": false,
+    "mimeType": "multipart/form-data",
+    "data": form
+  }
+
+  return settings
+}
+
+function create_json_request(data, url){
+
+  var settings = {
+    "async": true,
+    "crossDomain": true,
+    "url": url,
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json",
+      "cache-control": "no-cache",
+    },
+    "processData": false,
+    "data": JSON.stringify(data)
+  }
+
+  return settings
+
+}
+
+do_save = function(score, edits){
+  var imgbody = {
+    "image_id": [currentData._items[0]._id],
+    "edit_data": edits,
+    "player_id": score["name"]
+  }
+
+  var settings = create_request(imgbody,"http://glacial-garden-24920.herokuapp.com/edits")
+
+  $.ajax(settings).done(function(response){console.log(response)})
+
+  var scoresettings = create_json_request(score, "http://glacial-garden-24920.herokuapp.com/player")
+  $.ajax(scoresettings).done(function(response){console.log(response)})
+
+}
+
+get_next = function(){
+  var page = getRandomInt(1,collection_size)
+
+  $.get("http://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page="+page, function(data, status, jqXhr){
+    view.setZoom(1)
+
+    base.setSource(data._items[0].base_image_url)
+    var answer = data._items[0].truth_data
+    /*$.getJSON(answer, function(data){
+      window.answer = data
+      console.log("got new answer", answer)
+    })*/
+    roi.clear()
+    draw.history = [[]]
+    window.zoomFactor = 1
+    window.panFactor = {x:0, y:0}
+    currentData = data
+
+  })
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
