@@ -10,7 +10,7 @@ if (profile){
 else{
   try {
     var code = window.location.href.match(/\?code=(.*)/)[1];
-    $.getJSON('http://aqueous-reef-70776.herokuapp.com/authenticate/'+code, function(data) {
+    $.getJSON('https://aqueous-reef-70776.herokuapp.com/authenticate/'+code, function(data) {
       console.log("data token is", data.token);
       getProfile(data.token, function(profile){
         console.log(profile)
