@@ -60,11 +60,11 @@ do_save = function(score, edits){
     "player_id": score["name"]
   }
 
-  var settings = create_request(imgbody,"http://glacial-garden-24920.herokuapp.com/edits")
+  var settings = create_request(imgbody,"https://glacial-garden-24920.herokuapp.com/edits")
 
   $.ajax(settings).done(function(response){console.log(response)})
 
-  var scoresettings = create_json_request(score, "http://glacial-garden-24920.herokuapp.com/player")
+  var scoresettings = create_json_request(score, "https://glacial-garden-24920.herokuapp.com/player")
   $.ajax(scoresettings).done(function(response){console.log(response)})
   show_save(score)
 }
@@ -72,7 +72,7 @@ do_save = function(score, edits){
 get_next = function(){
   var page = getRandomInt(1,collection_size)
 
-  $.get("http://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page="+page, function(data, status, jqXhr){
+  $.get("https://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page="+page, function(data, status, jqXhr){
     view.setZoom(1)
 
     base.setSource(data._items[0].base_image_url)

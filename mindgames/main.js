@@ -615,7 +615,7 @@ onmousewheel = mousewheel
 
 Login(function(){
 
-  $.get("http://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page=1", function(data, status, jqXhr){
+  $.get("https://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page=1", function(data, status, jqXhr){
     console.log("data is", data)
 
     currentData = data
