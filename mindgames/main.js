@@ -661,6 +661,8 @@ Login(function(){
       window.base = base
       window.roi = roi
       window.view = view
+
+      show_eval()
     };
 
   })

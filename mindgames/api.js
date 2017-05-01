@@ -66,7 +66,7 @@ do_save = function(score, edits){
 
   var scoresettings = create_json_request(score, "http://glacial-garden-24920.herokuapp.com/player")
   $.ajax(scoresettings).done(function(response){console.log(response)})
-
+  show_save(score)
 }
 
 get_next = function(){
@@ -86,7 +86,7 @@ get_next = function(){
     window.zoomFactor = 1
     window.panFactor = {x:0, y:0}
     currentData = data
-
+    show_eval()
   })
 }
 

@@ -29,3 +29,15 @@ highlight_active = function(){
 
   $("#"+window.mode).tab("show")
 }
+
+show_eval = function(){
+  var output =  Mustache.render('<h4>Color the MS Lesions <button class="btn btn-primary btn-xsmall" onclick="do_eval()">Evaluate</button></h4>')
+  $("#submission_info").html(output)
+}
+
+show_save = function(score){
+  score["acc"] = score["accuracy"].toString()
+  score["acc"] = score["acc"].slice(0,4)
+  var output = Mustache.render('<h4> accuracy: {{acc}}, points: {{xp}} <button class="btn btn-success btn-xsmall" onclick="get_next()">Next</button> </h4>', score)
+  $("#submission_info").html(output)
+}
