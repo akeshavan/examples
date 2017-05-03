@@ -7,7 +7,7 @@ do_eval = function(){
     var profile = store.get("github_profile")
     var score = {"name": profile.login, "edit_data_id": [data._items[0]._id]}
     score["xp"] = cscore.tp - cscore.fn - cscore.fp
-    score["accuracy"] = score.xp/(cscore.tp + cscore.fn + cscore.fp)
+    score["accuracy"] = 2* cscore.tp/(2* cscore.tp + cscore.fn + cscore.fp) //this is the dice coefficient
     console.log("score is", score)
     do_save(score, JSON.stringify(roi.pixelLog))
   })

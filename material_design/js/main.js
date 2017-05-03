@@ -445,6 +445,8 @@ changeMode = function(e){
     endBright()
   }
   window.mode = e
+  console.log("setting menu icon", window.mode)
+  setMenuIcon(window.mode)
   //$("#currentTool").html(window.mode)
 
 }
@@ -749,7 +751,7 @@ function start(base_url){
     //default mode:
     console.log("TODO: figure out why this function runs")
     if (!window.mode){
-      window.mode = "paint"
+      changeMode("paint")
     }
     //DEBUG: Set some global variables
     window.base = base

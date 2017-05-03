@@ -1,15 +1,47 @@
 $("#brightness_slider").change(function(e){
-  doBright(e.target.value)
+  //doBright(e.target.value)
+  doBrightCont()
 })
 $("#contrast_slider").change(function(e){
-  doCont(e.target.value)
+  //doCont(e.target.value)
+  doBrightCont()
 })
 $("#brightness_slider").on("mouseup",function(e){
-  doBright(e.target.value)
+  //doBright(e.target.value)
+  doBrightCont()
 })
 $("#contrast_slider").on("mouseup",function(e){
-  doCont(e.target.value)
+  //doCont(e.target.value)
+  doBrightCont()
 })
+
+
+
+function setMenuIcon(mode){
+
+  var all_classnames = "mdi mdi-format-color-fill mdi-eraser-variant mdi-format-clear"
+  var component = $(".mdl-layout__header .mdl-layout__drawer-button i")
+  component.removeClass(all_classnames)
+  component.html("")
+  
+  switch (mode) {
+    case "paint":
+      component.html("brush")
+      break
+    case "paintFill":
+      component.addClass("mdi mdi-format-color-fill")
+      break
+    case "erase":
+      component.addClass("mdi mdi-eraser-variant")
+      break
+    case "eraseFill":
+      component.addClass("mdi mdi-format-clear")
+      break;
+
+    default:
+      break
+  }
+}
 
 blockContextMenu = function (evt) {
   evt.preventDefault();
@@ -27,8 +59,12 @@ show_eval = function(){
 }
 
 show_save = function(score){
-  //score["acc"] = score["accuracy"].toString()
-  //score["acc"] = score["acc"].slice(0,4)
+  score["acc"] = score["accuracy"].toString()
+  score["acc"] = score["acc"].slice(0,4)
+  var snackbarContainer = document.querySelector('#demo-toast-example');
+  var data = {message: 'Points: ' + score.xp + " Accuracy: " + score.acc,
+              timeout: 10000};
+  snackbarContainer.MaterialSnackbar.showSnackbar(data);
   //var output = Mustache.render('<h4> accuracy: {{acc}}, points: {{xp}} <button class="btn btn-success btn-xsmall" onclick="get_next()">Next</button> </h4>', score)
   $("#submit_button").html("Next")
   console.log("setting click to get_next")
