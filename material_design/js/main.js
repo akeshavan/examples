@@ -205,6 +205,17 @@ Raster.prototype.brightness = function(bright, level) {
   });
 }
 
+Raster.prototype.brightness_contrast = function(bright, level) {
+
+  var self = this;
+  level = Math.pow((level + 100) / 100, 2);
+  return this.process(function(r, g, b, a) {
+    return [((r / 255 - 0.5) * level + 0.5) * 255 * bright,
+            ((g / 255 - 0.5) * level + 0.5) * 255 * bright,
+            ((b / 255 - 0.5) * level + 0.5) * 255 * bright, a];
+  });
+}
+
 
 
 
@@ -499,14 +510,13 @@ window.brightCircle = null
 
 doBright = function(e){
   /*
-    Adjust brightness based on how far left/right of the center is clicked.
-    Adjust contrast based on how far up/down of the center is clicked.
+    TODO: apply contrast value here too, this isn't right
   */
   //console.log("setting brightness")
   var amount = (parseInt(e) - 50)/50 + 1
-  console.log(amount)
-  all_rasters[0].brightness(amount)
-
+  console.log("bright", amount)
+  //base.brightness(amount)
+  return amount
 }
 
 doCont = function(e){
@@ -516,10 +526,16 @@ doCont = function(e){
   */
   //console.log("setting brightness")
   var amount = (parseInt(e)*2) - 100
-  console.log(amount)
+  console.log("cont", amount)
+  return amount
+  //base.contrast(amount)
 
-  all_rasters[0].contrast(amount)
+}
 
+doBrightCont = function(){
+  var bright = doBright($("#brightness_slider")[0].value)
+  var cont = doCont($("#contrast_slider")[0].value)
+  base.brightness_contrast(bright, cont)
 }
 
 startBright = function(){
