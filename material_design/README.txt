@@ -1,4 +1,1 @@
-
-* fix scoring system
-
-* add loader bars
+* only save changes from truth (or the 1s)

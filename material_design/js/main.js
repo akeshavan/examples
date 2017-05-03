@@ -764,7 +764,7 @@ function start(base_url){
 
 startProgress()
 Login(function(){
-  $.get("http://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page=1", function(data, status, jqXhr){
+  $.get("https://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page=1", function(data, status, jqXhr){
     window.currentData = data
     var base_url = data._items[0].base_image_url
     var truth_data_url = data._items[0].truth_data
