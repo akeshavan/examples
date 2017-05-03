@@ -27,7 +27,7 @@ function stopProgress(){
 
 function setMenuIcon(mode){
 
-  var all_classnames = "mdi mdi-format-color-fill mdi-eraser-variant mdi-format-clear"
+  var all_classnames = "mdi mdi-format-color-fill mdi-eraser-variant mdi-format-clear mdi-arrow-all"
   var component = $(".mdl-layout__header .mdl-layout__drawer-button i")
   component.removeClass(all_classnames)
   component.html("")
@@ -45,7 +45,9 @@ function setMenuIcon(mode){
     case "eraseFill":
       component.addClass("mdi mdi-format-clear")
       break;
-
+    case "view":
+        component.addClass("mdi mdi-arrow-all")
+        break;
     default:
       break
   }

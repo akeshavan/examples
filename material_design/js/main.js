@@ -588,7 +588,7 @@ dragHandler = function(e){
     case "zoom":
       doZoom(e)
       break
-    case "pan":
+    case "view":
       doPan(e)
       break;
 
@@ -632,14 +632,14 @@ mousedownHandler = function(e){
 
   var me = this
   var mode = window.mode
-  console.log(e.event.button)
+  //console.log(e.event.button)
   if (e.event.button == 2){
     //right click and drag
     window.panMouseDown = e
   }
 
   switch (mode) {
-    case "pan":
+    case "view":
       window.panMouseDown = e
       break;
     case "paint":
@@ -670,54 +670,7 @@ onmousewheel = mousewheel
                                     MAIN
 ==============================================================================*/
 
-//base_img = "http://localhost:9876/files/tiles/outputs/mse863/ax_slice070.jpg"
-//var mask_img = "http://localhost:9876/files/tiles/outputs/mse863/ax_slice070.json"
-/*
-try {
-  var code = window.location.href.match(/\?code=(.*)/)[1];
-  $.getJSON('http://aqueous-reef-70776.herokuapp.com/authenticate/'+code, function(data) {
-    console.log("data token is", data.token);
-    getProfile(data.token, function(profile){
-      console.log(profile)
-      var output = Mustache.render('<h4><img class="img-circle" width="25px" height="25px" style="margin-right:10px;" src="{{avatar_url}}"/>{{login}}</h4>', profile)
-      $("#login_info").html(output)
-    })
-  });
 
-} catch (e) {
-  var dialog = bootbox.dialog({
-    title: 'Click to Login with GitHub:',
-    message: '<a href="https://github.com/login/oauth/authorize?client_id=bdf880910c19a91f4a7f" style="color: black;"> <img src="./Octocat.jpg" width="100%"/></a>'
-  });
-}
-
-function getProfile (token, callback) {
-  var options = {
-    url: 'https://api.github.com/user',
-    json: true,
-    headers: {
-      authorization: 'token ' + token
-    }
-  }
-  console.log("going to call AJAX")
-  $.ajax({
-      url: 'https://api.github.com/user',
-      headers: {
-        authorization: 'token ' + token
-      },
-      success: function(data, status, jqxhr){
-        callback(data)
-      }
-  });
-
-}
-
-
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}*/
 
 function start(base_url){
 
@@ -775,30 +728,37 @@ Login(function(){
   });
 });
 
+var stage = document.getElementById('myCanvas');
+var mc = new Hammer.Manager(stage, {stopPropagation:true, preventDefault:true});
+var Pinch = new Hammer.Pinch();
 
+// add the recognizer
+mc.add(Pinch);
+
+// subscribe to events
+mc.on('pinch', function(e) {
+    // do something cool
+
+    if (e){
+      //e.stopPropagation()
+      //var tmp = window.mode
+      //window.mode = null
+      if (window.mode == "view"){
+        e.preventDefault()
+        var zoomFactor = window.zoomFactor + ((e.scale-1))/10
+        window.zoomFactor = xfm.clamp(zoomFactor, 1, 5)
+        view.setZoom(window.zoomFactor)
+      }
+      /*if (e.scale < 0.95 || e.scale > 1.05){
+          view.setZoom(e.scale)
+          console.log("event is", e.deltaX, e.deltaY)
+      }*/
+      //e.gesture.stopPropagation()
+      //window.mode = tmp
+    }
+    //e.stopPropagation()
+    //e.preventDefault()
+});
 
 
 //start("images/brain.jpg")
-
-//var hammertime = new Hammer($("#myCanvas"), {});
-//hammertime.get('pinch').set({ enable: true });
-
-/*
-save_and_next = function(){
-  var page = getRandomInt(1,collection_size)
-  $.get("http://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page="+page, function(data, status, jqXhr){
-    view.setZoom(1)
-    var base_url
-    base.setSource(data._items[0].base_image_url)
-    var answer = data._items[0].truth_data
-    $.getJSON(answer, function(data){
-      window.answer = data
-      console.log("got new answer", answer)
-    })
-    roi.clear()
-    draw.history = [[]]
-    window.zoomFactor = 1
-    window.panFactor = {x:0, y:0}
-
-  })
-}*/
