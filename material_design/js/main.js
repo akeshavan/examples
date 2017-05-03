@@ -762,7 +762,7 @@ function start(base_url){
   };
 }
 
-
+startProgress()
 Login(function(){
   $.get("http://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page=1", function(data, status, jqXhr){
     window.currentData = data

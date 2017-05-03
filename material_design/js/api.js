@@ -1,6 +1,7 @@
 
 do_eval = function(){
   console.log("DOING EVAL\n\n")
+  startProgress()
   var data = window.currentData
   $.getJSON(data._items[0].truth_data, function(truth){
     var cscore = roi.diff(truth)
@@ -9,6 +10,7 @@ do_eval = function(){
     score["xp"] = cscore.tp - cscore.fn - cscore.fp
     score["accuracy"] = 2* cscore.tp/(2* cscore.tp + cscore.fn + cscore.fp) //this is the dice coefficient
     console.log("score is", score)
+    stopProgress()
     do_save(score, JSON.stringify(roi.pixelLog))
   })
 }
@@ -55,6 +57,7 @@ function create_json_request(data, url){
 }
 
 do_save = function(score, edits){
+  startProgress()
   var imgbody = {
     "image_id": [window.currentData._items[0]._id],
     "edit_data": edits,
@@ -68,6 +71,7 @@ do_save = function(score, edits){
   var scoresettings = create_json_request(score, "https://glacial-garden-24920.herokuapp.com/player")
   $.ajax(scoresettings).done(function(response){
     console.log(response)
+    stopProgress()
     show_save(score)
   })
 
@@ -75,7 +79,7 @@ do_save = function(score, edits){
 
 get_next = function(){
   var page = getRandomInt(1,collection_size)
-
+  startProgress()
   $.get("https://glacial-garden-24920.herokuapp.com/image?where=mode==train&max_results=1&page="+page, function(data, status, jqXhr){
     view.setZoom(1)
 
@@ -91,6 +95,7 @@ get_next = function(){
     window.zoomFactor = 1
     window.panFactor = {x:0, y:0}
     window.currentData = data
+    stopProgress()
     show_eval()
   })
 }

@@ -15,7 +15,15 @@ $("#contrast_slider").on("mouseup",function(e){
   doBrightCont()
 })
 
+function startProgress(){
+  var spot = $("#pbar")
+  spot.show()
+}
 
+function stopProgress(){
+  var spot = $("#pbar")
+  spot.hide()
+}
 
 function setMenuIcon(mode){
 
@@ -23,7 +31,7 @@ function setMenuIcon(mode){
   var component = $(".mdl-layout__header .mdl-layout__drawer-button i")
   component.removeClass(all_classnames)
   component.html("")
-  
+
   switch (mode) {
     case "paint":
       component.html("brush")

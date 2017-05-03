@@ -1,5 +1,5 @@
 function Login(callback){
-
+startProgress()
 var profile = store.get("github_profile")
 currentData = null
 if (profile){
@@ -7,9 +7,11 @@ if (profile){
   $("#login_info").html(output)
   $("#login_name").html(profile.login)
   callback()
+  stopProgress()
 }
 else{
   try {
+    startProgress()
     var code = window.location.href.match(/\?code=(.*)/)[1];
     $.getJSON('https://aqueous-reef-70776.herokuapp.com/authenticate/'+code, function(data) {
       console.log("data token is", data.token);
@@ -25,6 +27,7 @@ else{
         }
         store.set("github_profile", profile)
         callback()
+        stopProgress()
       })
     });
 
