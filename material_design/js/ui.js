@@ -15,6 +15,7 @@ $("#contrast_slider").on("mouseup",function(e){
   doBrightCont()
 })
 
+
 function startProgress(){
   var spot = $("#pbar")
   spot.show()

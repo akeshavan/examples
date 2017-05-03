@@ -711,6 +711,8 @@ function start(base_url){
     window.roi = roi
     window.view = view
     //("#currentTool").html(window.mode)
+    $(".mdl-layout__drawer-button").addClass("mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored")
+
 
   };
 }
@@ -725,6 +727,7 @@ Login(function(){
     //Load the base image
     console.log("going to start")
     start(base_url)
+
   });
 });
 
