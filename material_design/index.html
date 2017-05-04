@@ -59,8 +59,8 @@
       display: block;
       right: 0;
       bottom: 0;
-      margin-right: 40px;
-      margin-bottom: 40px;
+      margin-right: 2%;
+      margin-bottom: 2%;
       z-index: 900;
     }
     #zoompan {
@@ -68,17 +68,17 @@
       display: block;
       left: 0;
       bottom: 0;
-      margin-left: 40px;
-      margin-bottom: 40px;
+      margin-left: 2%;
+      margin-bottom: 2%;
       z-index: 2;
     }
     </style>
   </head>
   <body>
     <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
-      <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+      <header class="demo-header mdl-layout__header mdl-color--accent-contrast mdl-color-text--grey-100">
         <div class="mdl-layout__header-row">
-          <span class="mdl-layout-title">Color the Lesions </span>
+          <span class="mdl-layout-title" id="titlebar">Color the Lesions </span>
           <div class="mdl-layout-spacer"></div>
           <div id="currentTool" hidden></div>
           <div class="mdl-layout-spacer"></div>
@@ -191,10 +191,10 @@
       </main>
     </div>
 
-    <a onClick="draw.revert(roi)" id="view-source" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-color-text--white">Undo</a>
+    <a onClick="draw.revert(roi)" id="view-source" class="mdl-button mdl-js-button mdl-button--fab mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-button--primary mdl-color-text--white"><i class="material-icons">replay</i></a>
     <!-- Colored FAB button with ripple -->
-    <button id="zoompan" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" onclick="changeMode('view')">
-      <i class="material-icons mdi mdi-arrow-all"></i>
+    <button id="zoompan" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-color-text--white mdl-color--accent-contrast" onclick="changeMode('view')">
+      <i class="material-icons">open_with</i>
     </button>
 <!--
 
@@ -215,17 +215,6 @@
         <button type="button" class="mdl-button">Close</button>
     </div>-->
 </dialog>
-
-<!--
-
-Scoring toast
-
--->
-
-<div id="demo-toast-example" class="mdl-js-snackbar mdl-snackbar" style="background:rgb(0, 188, 212);">\
-  <div class="mdl-snackbar__text"></div>\
-  <button class="mdl-snackbar__action" type="button"></button>\
-</div>
 
 
 

@@ -320,7 +320,7 @@ draw.counter = 0
 draw.history = [[]]
 
 draw.LUT = {0: {red: 0, green:0, blue:0, alpha:0},
-            1:"darkviolet",
+            1: "darkviolet",
             2: "cyan",
             3: "gold",
             4: "plum",

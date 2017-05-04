@@ -36,23 +36,28 @@ function setMenuIcon(mode){
   switch (mode) {
     case "paint":
       component.html("brush")
-      $("#zoompan").removeClass("mdl-button--colored")
+      $("#zoompan").removeClass("mdl-button--primary")
+      $("#zoompan").addClass("mdl-color--accent-contrast")
       break
     case "paintFill":
       component.addClass("mdi mdi-format-color-fill")
-      $("#zoompan").removeClass("mdl-button--colored")
+      $("#zoompan").removeClass("mdl-button--primary")
+      $("#zoompan").addClass("mdl-color--accent-contrast")
       break
     case "erase":
       component.addClass("mdi mdi-eraser-variant")
-      $("#zoompan").removeClass("mdl-button--colored")
+      $("#zoompan").removeClass("mdl-button--primary")
+      $("#zoompan").addClass("mdl-color--accent-contrast")
       break
     case "eraseFill":
       component.addClass("mdi mdi-format-clear")
-      $("#zoompan").removeClass("mdl-button--colored")
+      $("#zoompan").removeClass("mdl-button--primary")
+      $("#zoompan").addClass("mdl-color--accent-contrast")
       break;
     case "view":
-      component.addClass("mdi mdi-arrow-all")
-      $("#zoompan").addClass("mdl-button--colored")
+      component.html("open_with")
+      $("#zoompan").removeClass("mdl-color--accent-contrast")
+      $("#zoompan").addClass("mdl-button--primary")
       break;
 
     default:
@@ -73,6 +78,7 @@ show_eval = function(){
   $("#submit_button").html("Submit")
   console.log("setting click to do_eval")
   $("#submit_button").attr("onclick", "do_eval()")
+  $("#titlebar").html("Color the Lesions")
 }
 
 show_save = function(score){
@@ -81,7 +87,8 @@ show_save = function(score){
   var snackbarContainer = document.querySelector('#demo-toast-example');
   var data = {message: 'Points: ' + score.xp + " Accuracy: " + score.acc,
               timeout: 10000};
-  snackbarContainer.MaterialSnackbar.showSnackbar(data);
+  //snackbarContainer.MaterialSnackbar.showSnackbar(data);
+  $("#titlebar").html(data.message)
   //var output = Mustache.render('<h4> accuracy: {{acc}}, points: {{xp}} <button class="btn btn-success btn-xsmall" onclick="get_next()">Next</button> </h4>', score)
   $("#submit_button").html("Next")
   console.log("setting click to get_next")

@@ -2947,7 +2947,7 @@ ol {
     background: 0 0;
     border: none;
     border-radius: 2px;
-    color: #000;
+    color: #f5f5f5;
     position: relative;
     height: 36px;
     margin: 0;
@@ -3082,7 +3082,7 @@ input.mdl-button[type="submit"] {
 
 .mdl-button--fab.mdl-button--colored {
     background: rgb(64, 196, 255);
-    color: rgb(66, 66, 66)
+    color: #f5f5f5
 }
 
 .mdl-button--fab.mdl-button--colored:hover {
