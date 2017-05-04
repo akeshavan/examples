@@ -438,35 +438,25 @@ changeMode = function(e){
   /*
     Set the window's mode to e. e is a string. Examples "fill", "paint", etc
   */
-  if (e=="brightness" && window.mode != "brightness"){
-    startBright()
+  if (window.mode != "view"){
+    window.prevMode = window.mode
   }
-  else if (window.mode == "brightness" && e != "brightness"){
-    endBright()
+  else{
+    if (e=="view"){
+      $("#zoompan").removeClass("mdl-button--colored")
+      e = window.prevMode
+    }
   }
+
   window.mode = e
   console.log("setting menu icon", window.mode)
+
   setMenuIcon(window.mode)
   //$("#currentTool").html(window.mode)
 
 }
 
-activate = function(command){
 
-  //console.log("commnd is", '$("#'+command+'").tab("show")')
-  window.prevMode = window.mode
-  if (command  == "undo"){
-    draw.revert(roi)
-  }
-  else{
-    changeMode(command)
-  }
-
-}
-
-highlight_active = function(){
-  $("#"+window.mode).tab("show")
-}
 
 
 window.paintVal = 1

@@ -63,6 +63,15 @@
       margin-bottom: 40px;
       z-index: 900;
     }
+    #zoompan {
+      position: fixed;
+      display: block;
+      left: 0;
+      bottom: 0;
+      margin-left: 40px;
+      margin-bottom: 40px;
+      z-index: 2;
+    }
     </style>
   </head>
   <body>
@@ -143,11 +152,7 @@
             </label>
           </a>
 
-          <a class="mdl-navigation__link"><i class="mdl-color-text--blue-grey-400 material-icons mdi mdi-arrow-all" role="presentation"></i>Move/Zoom
-            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-5" style="margin-left:10px;">
-              <input type="radio" id="option-5" class="mdl-radio__button" name="options" value="5" onclick="changeMode('view')">
-            </label>
-          </a>
+
 
           <a class="mdl-navigation__link nohover" ><i class="mdl-color-text--blue-grey-400 material-icons mdi mdi-eye" role="presentation"></i>Visibility
             <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-1" style="margin-left:10px;">
@@ -187,7 +192,10 @@
     </div>
 
     <a onClick="draw.revert(roi)" id="view-source" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored mdl-color-text--white">Undo</a>
-
+    <!-- Colored FAB button with ripple -->
+    <button id="zoompan" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" onclick="changeMode('view')">
+      <i class="material-icons mdi mdi-arrow-all"></i>
+    </button>
 <!--
 
   Login Modal

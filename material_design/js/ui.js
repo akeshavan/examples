@@ -36,19 +36,25 @@ function setMenuIcon(mode){
   switch (mode) {
     case "paint":
       component.html("brush")
+      $("#zoompan").removeClass("mdl-button--colored")
       break
     case "paintFill":
       component.addClass("mdi mdi-format-color-fill")
+      $("#zoompan").removeClass("mdl-button--colored")
       break
     case "erase":
       component.addClass("mdi mdi-eraser-variant")
+      $("#zoompan").removeClass("mdl-button--colored")
       break
     case "eraseFill":
       component.addClass("mdi mdi-format-clear")
+      $("#zoompan").removeClass("mdl-button--colored")
       break;
     case "view":
-        component.addClass("mdi mdi-arrow-all")
-        break;
+      component.addClass("mdi mdi-arrow-all")
+      $("#zoompan").addClass("mdl-button--colored")
+      break;
+
     default:
       break
   }
