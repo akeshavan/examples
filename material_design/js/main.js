@@ -748,7 +748,7 @@ mc.on('pinch', function(e) {
       //window.mode = null
       if (window.mode == "view"){
         e.preventDefault()
-        var zoomFactor = window.zoomFactor + ((e.scale-1))/10
+        var zoomFactor = window.zoomFactor*e.scale
         window.zoomFactor = xfm.clamp(zoomFactor, 1, 5)
         view.setZoom(window.zoomFactor)
       }
