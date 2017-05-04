@@ -85,10 +85,14 @@ show_save = function(score){
   score["acc"] = score["accuracy"].toString()
   score["acc"] = score["acc"].slice(0,4)
   var snackbarContainer = document.querySelector('#demo-toast-example');
-  var data = {message: 'Points: ' + score.xp + " Accuracy: " + score.acc,
-              timeout: 10000};
+  var message = ""
+  var message = score.xp > 0 ? '<i class="material-icons">add_circle</i>' : '<i class="material-icons">remove_circle</i>'
+  message = message + Math.abs(score.xp)
+  message = message + '<i class="material-icons" style="padding-left:1em;">gps_fixed</i>' + score.acc 
+
+
   //snackbarContainer.MaterialSnackbar.showSnackbar(data);
-  $("#titlebar").html(data.message)
+  $("#titlebar").html(message)
   //var output = Mustache.render('<h4> accuracy: {{acc}}, points: {{xp}} <button class="btn btn-success btn-xsmall" onclick="get_next()">Next</button> </h4>', score)
   $("#submit_button").html("Next")
   console.log("setting click to get_next")
