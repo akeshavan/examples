@@ -4,12 +4,19 @@
 
 var all_rasters = []
 
-view.onResize = function(){
+window.onresize = function(){
   /*
     When the window size changes, change the bounds of all rasters
   */
-  all_rasters.map(function(r){r.fitBounds(view.bounds)})
+  //all_rasters.map(function(r){r.fitBounds(view.bounds)})
+  console.log("resizing")
+  base.fitBounds(view.bounds)
+  roi.fitBounds(view.bounds)
 }
+
+/*$( window ).resize(function() {
+  $( "#log" ).append( "<div>Handler for .resize() called.</div>" );
+})*/
 
 function copyImageData(ctx, src)
 {
