@@ -1,0 +1,208 @@
+<html>
+<head>
+  <style>
+
+    .brainWidget {
+      width: 300px;
+      height: 300px;
+      border:1px solid #c0c0c0;
+    }
+
+
+  </style>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="column.css">
+  <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+  <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+</head>
+
+<body>
+  <div class="container">
+    <div id="app">
+      <h1>{{ message }}</h1>
+      <h5>{{authors}}</h5>
+      <p class="make-column">
+        {{abstract}}
+      </p>
+      <div v-for="exp in experiments">
+         <div class="row">
+           <brain-widget :id="exp.id" :locations="exp.locations" :canvasid="exp.canvas_id" :tableid="exp.table_id"></brain-widget>
+           <div class="col-md-8"><local-table v-model="people"></local-table></div>
+         </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+
+<script src="https://unpkg.com/vue"></script>
+<script src="three.min.js"></script>
+<script src="trackball-controls.js"></script>
+<script src="subdivision-modifier.js"></script>
+<script src="jquery.js"></script>
+<script src="PLYLoader.js"></script>
+<script src="brain-widget.js"></script>
+<script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/sortable/1.4.2/Sortable.min.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/David-Desmaisons/Vue.Draggable/master/dist/vuedraggable.min.js"></script>
+
+<script type="text/x-template" id="tab">
+  <table>
+  <thead>
+    <tr>
+      <th>Actual table with tr/td tags</th>
+    </tr>
+  </thead>
+  <draggable v-model="list" :element="'tbody'">
+    <tr v-for="(person, index) in list" :key="person">
+      <local-td :item="person"></local-td>
+    </tr>
+  </draggable>
+</table>
+</script>
+
+ <script type="text/x-template" id="tr">
+  <td>{{item.name}}</td>
+  <td>{{item.age}}</td>
+</script>
+
+<script>
+
+
+Vue.component("brain-widget", {
+  template: `<div class="col-md-4">
+              <div v-bind:id="id" class="brainWidget"></div>
+              <canvas :id="canvasid" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none"></canvas>
+              <div class="col-md-8" v-bind:id="tableid"></div>
+             </div>`,
+  props: ["id", "locations", "canvasid", "tableid"],
+  data: function(){
+    return {
+      //locations: [],
+      brain: null,
+      renderer: null
+    }
+
+  },
+  watch: {
+    locations: function(){
+      console.log("updating brain widget?", this.locations)
+      this.brain.locations = this.locations
+      this.brain.updateSpheres()
+    }
+  },
+  created: function () {
+    console.log("creating")
+
+  },
+  mounted: function(){
+    console.log("ready")
+
+    this.brain = new Brain("#"+this.id, "lrh3.ply", "#"+this.canvasid)
+    this.brain.renderer = new THREE.WebGLRenderer({
+                          canvas: document.getElementById(this.canvasid),
+                          antialias: true, // to get smoother output
+                          preserveDrawingBuffer: true, // to allow screenshot
+                          alpha: true
+                        });
+    this.brain.renderer.setClearColor(0xffffff, 0);
+    this.brain.renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+
+    this.brain.animate()
+    this.brain.locations = this.locations
+    this.brain.updateSpheres()
+    this.brain.mouseDown(function(sphere_mesh, location_row){
+      console.log("you clicked", sphere_mesh, location_row)
+    })
+  }
+
+})
+
+var localTd = {
+  template: `
+      <div>
+       <td>{{item.name}}</td>
+       <td>{{item.age}}</td>
+     </div>
+    `,
+  props: ['item'],
+  name: 'local-td'
+};
+
+var localTable = {
+  components:{
+    localTd:localTd
+  },
+  template: '#tab',
+  props: ['value'],
+  name: 'local-table',
+  computed: {
+    list: {
+        get() {
+            return this.value
+        },
+        set(value) {
+            this.$emit('input', value)
+        }
+    }
+	}
+};
+
+var app = new Vue({
+  el: '#app',
+  components: {
+  	localTable:localTable
+  },
+  data: {
+    message: 'Loading...',
+    abstract: "Loading..",
+    authors: "Loading..",
+    experiments: [],
+    people: [
+        {name: "Abby", age:5},
+        {name: "Brooke", age:6},
+        {name: "Courtney", age:2},
+        {name: "David", age:9}
+      ]
+  }
+})
+
+
+var id = 19892766 //17566765
+$($.ajax({
+            type: "GET",
+            url: "http://localhost:5000/json/article?pmid="+id
+        }).complete(function(o) { // MAIN INIT
+              var j = o.responseText;
+              //console.log(j);
+              var obj = JSON.parse(j);
+              console.log(obj)
+              app.message = obj.title
+              app.authors = obj.authors
+              app.abstract = obj.abstract
+              obj.experiments = JSON.parse(obj.experiments)
+              obj.experiments.forEach(function(obj, idx, arr){
+                arr[idx].locations = _.map(obj.locations, function(loc){
+                  var coords = loc.split(",")
+                  return {"x": parseFloat(coords[0]),
+                          "y": parseFloat(coords[1]),
+                          "z": parseFloat(coords[2])}
+                })
+                arr[idx]["canvas_id"] = "canvas"+idx
+                arr[idx]["table_id"] = "table"+idx
+              })
+              app.experiments = _.filter(obj.experiments, function(v){
+                return v.locations.length? true: false
+              })
+              obj.metadata = JSON.parse(obj.metadata)
+            })
+
+
+  )
+
+
+
+</script>
+</html>
