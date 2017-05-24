@@ -5,8 +5,38 @@
     .brainWidget {
       width: 300px;
       height: 300px;
-      border:1px solid #c0c0c0;
+      /*border:1px solid #c0c0c0;*/
     }
+
+    input {
+      background-color: transparent;
+      border: 0px solid;
+      width: 100%;
+      color: #CCC;
+    }
+
+    input:focus{
+      outline: none;
+    }
+
+    .table-wrapper {
+      position:relative;
+    }
+    .table-scroll {
+      height:300px;
+      overflow:auto;
+      margin-top:20px;
+    }
+
+    .table-wrapper table thead th .text {
+      position:absolute;
+      /*top:-20px;
+      z-index:2;
+      height:20px;
+      width:35%
+      border:1px solid red;*/
+    }
+
 
 
   </style>
@@ -25,15 +55,24 @@
         {{abstract}}
       </p>
       <div v-for="exp in experiments">
+        <div class="row">
+          <h5><Textfield v-model="exp.title" placeholder="Enter Title"></Textfield></h5>
+          <p><Textfield v-model="exp.caption" placeholder="Enter Caption"></Textfield></p>
+        </div>
          <div class="row">
-           <brain-widget :id="exp.id" :locations="exp.locations" :canvasid="exp.canvas_id" :tableid="exp.table_id"></brain-widget>
-           <div class="col-md-8"><local-table v-model="people"></local-table></div>
+           <brain-widget :id="exp.id" :locations="exp.locations" :canvasid="exp.canvas_id" :tableid="exp.table_id" :renderer="renderer"></brain-widget>
+           <div class="col-md-8">
+             <div class="row">
+               <local-table v-model="exp.locations"></local-table>
+             </div>
+           </div>
+
          </div>
       </div>
 
     </div>
   </div>
-
+  <canvas id="renderer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none"></canvas>
 </body>
 
 <script src="https://unpkg.com/vue"></script>
@@ -49,48 +88,67 @@
 <script type="text/javascript" src="https://cdn.rawgit.com/David-Desmaisons/Vue.Draggable/master/dist/vuedraggable.min.js"></script>
 
 <script type="text/x-template" id="tab">
-  <table>
-  <thead>
-    <tr>
-      <th>Actual table with tr/td tags</th>
-    </tr>
-  </thead>
-  <draggable v-model="list" :element="'tbody'">
-    <tr v-for="(person, index) in list" :key="person">
-      <local-td :item="person"></local-td>
-    </tr>
-  </draggable>
-</table>
-</script>
-
- <script type="text/x-template" id="tr">
-  <td>{{item.name}}</td>
-  <td>{{item.age}}</td>
+  <div class="table-wrapper">
+    <div class="table-scroll">
+      <table class="table table-striped table-hover table-responsive table-bordered table-condensed">
+        <thead>
+          <tr>
+            <th>x</th>
+            <th>y</th>
+            <th>z</th>
+            <th>Z effect</th>
+            <th>Edit/Insert/Delete</th>
+          </tr>
+        </thead>
+        <draggable v-model="list" :element="'tbody'">
+          <tr v-for="(person, index) in list" :key="person">
+            <td> <Textfield v-model="person.x"></Textfield></td>
+            <td> <Textfield v-model="person.y"></Textfield></td>
+            <td> <Textfield v-model="person.x"></Textfield></td>
+            <td> <Textfield v-model="person.Z_eff"></Textfield></td>
+            <td>
+              <button type="button" class="btn btn-danger" aria-label="Left Align">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="btn btn-success" aria-label="Left Align">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="btn btn-default" aria-label="Left Align">
+                <span class="glyphicon glyphicon-scissors" aria-hidden="true"></span>
+              </button>
+            </td>
+          </tr>
+        </draggable>
+      </table>
+    </div>
+  </div>
 </script>
 
 <script>
 
 
+
 Vue.component("brain-widget", {
   template: `<div class="col-md-4">
               <div v-bind:id="id" class="brainWidget"></div>
-              <canvas :id="canvasid" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none"></canvas>
+
               <div class="col-md-8" v-bind:id="tableid"></div>
              </div>`,
-  props: ["id", "locations", "canvasid", "tableid"],
+  props: ["id", "locations", "canvasid", "tableid", "renderer"],
   data: function(){
     return {
-      //locations: [],
       brain: null,
-      renderer: null
     }
 
   },
   watch: {
-    locations: function(){
-      console.log("updating brain widget?", this.locations)
-      this.brain.locations = this.locations
-      this.brain.updateSpheres()
+    locations: {
+      handler: function(){
+        console.log("updating brain widget?", this.locations)
+        this.brain.locations = this.locations
+        this.brain.updateSpheres()
+      },
+      deep: false //set this to true and you loop forever
     }
   },
   created: function () {
@@ -100,17 +158,10 @@ Vue.component("brain-widget", {
   mounted: function(){
     console.log("ready")
 
-    this.brain = new Brain("#"+this.id, "lrh3.ply", "#"+this.canvasid)
-    this.brain.renderer = new THREE.WebGLRenderer({
-                          canvas: document.getElementById(this.canvasid),
-                          antialias: true, // to get smoother output
-                          preserveDrawingBuffer: true, // to allow screenshot
-                          alpha: true
-                        });
-    this.brain.renderer.setClearColor(0xffffff, 0);
-    this.brain.renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+    this.brain = new Brain("#"+this.id, "lrh3.ply", "#renderer", this.renderer)
+    this.brain.renderer = this.renderer
 
-    this.brain.animate()
+    //this.brain.animate()
     this.brain.locations = this.locations
     this.brain.updateSpheres()
     this.brain.mouseDown(function(sphere_mesh, location_row){
@@ -120,57 +171,138 @@ Vue.component("brain-widget", {
 
 })
 
-var localTd = {
-  template: `
-      <div>
-       <td>{{item.name}}</td>
-       <td>{{item.age}}</td>
-     </div>
-    `,
-  props: ['item'],
-  name: 'local-td'
+
+const Textfield = {
+	props: ['value', 'placeholder'],
+  methods: {
+  	onInput(e) {
+    	const value = e.target.value;
+
+      //Add this line
+      this.$emit('input', value)
+    },
+    getPlaceholder(){
+      if (!this.value && this.placeholder){
+        return this.placeholder
+      }
+      else{
+        return ""
+      }
+    }
+  },
+	render(h) {
+  	return h('div', {
+    	class: [
+      	'textfield',
+      ]
+    }, [
+    	h('input', {
+      	domProps: {
+        	value: this.value,
+          placeholder: this.getPlaceholder()
+        },
+        on: {
+        	input: this.onInput,
+        },
+      	attrs: {
+        	type: 'text'
+        }
+      })
+    ]);
+  }
 };
 
 var localTable = {
-  components:{
-    localTd:localTd
-  },
   template: '#tab',
+  components: {
+    Textfield
+  },
   props: ['value'],
   name: 'local-table',
   computed: {
     list: {
         get() {
+            console.log("get")
             return this.value
         },
         set(value) {
+            console.log("set")
             this.$emit('input', value)
         }
     }
 	}
 };
 
+function getRenderer(){
+  var renderer = new THREE.WebGLRenderer({
+                        canvas: document.getElementById("renderer"),
+                        antialias: true, // to get smoother output
+                        preserveDrawingBuffer: true, // to allow screenshot
+                        alpha: true
+                      });
+  renderer.setClearColor(0xffffff, 0);
+  renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+  renderer.autoClear = false;
+  return renderer
+}
+
+
 var app = new Vue({
   el: '#app',
   components: {
-  	localTable:localTable
+  	localTable:localTable,
+    Textfield: Textfield
   },
   data: {
     message: 'Loading...',
     abstract: "Loading..",
     authors: "Loading..",
     experiments: [],
-    people: [
-        {name: "Abby", age:5},
-        {name: "Brooke", age:6},
-        {name: "Courtney", age:2},
-        {name: "David", age:9}
-      ]
+    renderer: null
+  },
+  watch: {
+    experiments: function(){
+      console.log("exp changed")
+    }
+  },
+  mounted: function(){
+    this.renderer = getRenderer()
+  },
+  methods:{
+    animate: function(){
+      var canvas=$("#renderer")[0]//$("#3d")[0];
+      var width = canvas.clientWidth;
+      var height = canvas.clientHeight;
+
+      if (canvas.width !== width || canvas.height != height) {
+          this.renderer.setSize ( width, height, false );
+      }
+      // render
+      this.renderer.setClearColor(0xffffff, 0);
+      this.renderer.clear(true);
+      this.renderer.enableScissorTest(true);
+
+      this.$children.forEach(function(item, idx, arr){
+        if ("brain" in item){
+          item.brain.render()
+        }
+      })
+      /*for (i in exp) {
+          if(exp[i].render) {
+              render(exp[i]);
+          }
+      }*/
+      //console.log("this is", this)
+
+      this.renderer.enableScissorTest(false);
+
+      requestAnimationFrame(this.animate.bind(this));
+    }
   }
 })
 
 
-var id = 19892766 //17566765
+var id = 19619662 //19892766 //17566765
 $($.ajax({
             type: "GET",
             url: "http://localhost:5000/json/article?pmid="+id
@@ -182,6 +314,7 @@ $($.ajax({
               app.message = obj.title
               app.authors = obj.authors
               app.abstract = obj.abstract
+
               obj.experiments = JSON.parse(obj.experiments)
               obj.experiments.forEach(function(obj, idx, arr){
                 arr[idx].locations = _.map(obj.locations, function(loc){
@@ -193,10 +326,11 @@ $($.ajax({
                 arr[idx]["canvas_id"] = "canvas"+idx
                 arr[idx]["table_id"] = "table"+idx
               })
+
               app.experiments = _.filter(obj.experiments, function(v){
                 return v.locations.length? true: false
               })
-              obj.metadata = JSON.parse(obj.metadata)
+              //obj.metadata = JSON.parse(obj.metadata)
             })
 
 

@@ -1,5 +1,6 @@
 function Brain(container_id, data_path, render_canvas)
 {
+
     var data_path = data_path || "lrh3.ply"
     var ex = {}
     ex.render={};
@@ -130,6 +131,7 @@ Brain.prototype.animate = function() {
     var canvas=$(this.render_canvas)[0]//$("#3d")[0];
     var width = canvas.clientWidth;
     var height = canvas.clientHeight;
+
     if (canvas.width !== width || canvas.height != height) {
         this.renderer.setSize ( width, height, false );
     }
@@ -145,7 +147,7 @@ Brain.prototype.animate = function() {
     //console.log("this is", this)
     this.render()
     this.renderer.enableScissorTest(false);
-    var me = this
+    
     requestAnimationFrame(this.animate.bind(this));
 }
 
@@ -206,7 +208,7 @@ Brain.prototype.addSphere = function(coord){
     this.ex.render.spheres.add(sph);
     coord.sph = sph
     this.locations.push(coord)
-    console.log("added sphere")
+    //console.log("added sphere")
   }
   else{
     console.log("sphere already exists")
