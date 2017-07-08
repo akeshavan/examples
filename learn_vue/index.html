@@ -94,10 +94,10 @@
         </thead>
         <draggable v-model="list" :element="'tbody'">
           <tr v-for="(person, index) in list" :key="person" v-on:mouseover="highlighter(person)">
-            <td> <Textfield v-model="person.x"></Textfield></td>
-            <td> <Textfield v-model="person.y"></Textfield></td>
-            <td> <Textfield v-model="person.z"></Textfield></td>
-            <td> <Textfield v-model="person.Z_eff"></Textfield></td>
+            <td> <Textfield v-model="person.x" :obj="person" :index="index" keyName="x"></Textfield></td>
+            <td> <Textfield v-model="person.y" :obj="person" :index="index" keyName="y"></Textfield></td>
+            <td> <Textfield v-model="person.z" :obj="person" :index="index" keyName="z"></Textfield></td>
+            <td> <Textfield v-model="person.Z_eff" :obj="person" :index="index" keyName="Z_eff"></Textfield></td>
             <td>
               <button type="button" class="btn btn-danger" aria-label="Left Align">
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
@@ -164,7 +164,7 @@ Vue.component('brain-widget', {
 });
 
 const Textfield = {
-  props: ['value', 'placeholder'],
+  props: ['value', 'placeholder', 'keyName', 'obj', 'index'],
   template: `
   <div class="textfield">
     <input :value="value" :placeholder="getPlaceholder()" v-on:input="onInput" type="text">
@@ -210,7 +210,7 @@ var localTable = {
   },
   methods: {
     highlighter: function (e) {
-      console.log('highlighted', e);
+      //console.log('highlighted', e);
     },
   },
 };
