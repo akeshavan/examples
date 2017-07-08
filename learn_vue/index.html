@@ -29,21 +29,14 @@
     }
 
     .table-wrapper table thead th .text {
-      position:absolute;
-      /*top:-20px;
-      z-index:2;
-      height:20px;
-      width:35%
-      border:1px solid red;*/
+      position:fixed;
     }
 
 
 
   </style>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="column.css">
-  <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
-  <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
 </head>
 
 <body>
@@ -82,10 +75,9 @@
 <script src="jquery.js"></script>
 <script src="PLYLoader.js"></script>
 <script src="brain-widget.js"></script>
-<script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/sortable/1.4.2/Sortable.min.js"></script>
-<script type="text/javascript" src="https://cdn.rawgit.com/David-Desmaisons/Vue.Draggable/master/dist/vuedraggable.min.js"></script>
+<script src="lodash.min.js"></script>
+<script type="text/javascript" src="Sortable.min.js"></script>
+<script type="text/javascript" src="vuedraggable.min.js"></script>
 
 <script type="text/x-template" id="tab">
   <div class="table-wrapper">
@@ -101,10 +93,10 @@
           </tr>
         </thead>
         <draggable v-model="list" :element="'tbody'">
-          <tr v-for="(person, index) in list" :key="person">
+          <tr v-for="(person, index) in list" :key="person" v-on:mouseover="highlighter(person)">
             <td> <Textfield v-model="person.x"></Textfield></td>
             <td> <Textfield v-model="person.y"></Textfield></td>
-            <td> <Textfield v-model="person.x"></Textfield></td>
+            <td> <Textfield v-model="person.z"></Textfield></td>
             <td> <Textfield v-model="person.Z_eff"></Textfield></td>
             <td>
               <button type="button" class="btn btn-danger" aria-label="Left Align">
@@ -128,215 +120,199 @@
 
 
 
-Vue.component("brain-widget", {
+Vue.component('brain-widget', {
   template: `<div class="col-md-4">
               <div v-bind:id="id" class="brainWidget"></div>
 
               <div class="col-md-8" v-bind:id="tableid"></div>
              </div>`,
-  props: ["id", "locations", "canvasid", "tableid", "renderer"],
-  data: function(){
+  props: ['id', 'locations', 'canvasid', 'tableid', 'renderer'],
+  data: function () {
     return {
       brain: null,
-    }
-
+    };
   },
+
   watch: {
     locations: {
-      handler: function(){
-        console.log("updating brain widget?", this.locations)
-        this.brain.locations = this.locations
-        this.brain.updateSpheres()
+      handler: function () {
+        console.log('updating brain widget?', this.locations);
+        this.brain.locations = this.locations;
+        this.brain.updateSpheres();
       },
-      deep: false //set this to true and you loop forever
-    }
+
+      deep: false, //set this to true and you loop forever
+    },
   },
   created: function () {
-    console.log("creating")
-
+    console.log('creating');
   },
-  mounted: function(){
-    console.log("ready")
 
-    this.brain = new Brain("#"+this.id, "lrh3.ply", "#renderer", this.renderer)
-    this.brain.renderer = this.renderer
+  mounted: function () {
+
+    this.brain = new Brain('#' + this.id, 'lrh3.ply', '#renderer', this.renderer);
+    this.brain.renderer = this.renderer;
 
     //this.brain.animate()
-    this.brain.locations = this.locations
-    this.brain.updateSpheres()
-    this.brain.mouseDown(function(sphere_mesh, location_row){
-      console.log("you clicked", sphere_mesh, location_row)
-    })
-  }
+    this.brain.locations = this.locations;
+    this.brain.updateSpheres();
+    this.brain.mouseDown(function (sphereMesh, locationRow) {
+      console.log('you clicked', sphereMesh, locationRow);
+    });
+  },
 
-})
-
+});
 
 const Textfield = {
-	props: ['value', 'placeholder'],
+  props: ['value', 'placeholder'],
+  template: `
+  <div class="textfield">
+    <input :value="value" :placeholder="getPlaceholder()" v-on:input="onInput" type="text">
+  </div>
+  `,
   methods: {
-  	onInput(e) {
-    	const value = e.target.value;
+      onInput(e) {
+        const value = e.target.value;
 
-      //Add this line
-      this.$emit('input', value)
-    },
-    getPlaceholder(){
-      if (!this.value && this.placeholder){
-        return this.placeholder
-      }
-      else{
-        return ""
-      }
-    }
-  },
-	render(h) {
-  	return h('div', {
-    	class: [
-      	'textfield',
-      ]
-    }, [
-    	h('input', {
-      	domProps: {
-        	value: this.value,
-          placeholder: this.getPlaceholder()
-        },
-        on: {
-        	input: this.onInput,
-        },
-      	attrs: {
-        	type: 'text'
+        //Add this line
+        this.$emit('input', value);
+      },
+
+      getPlaceholder() {
+        if (!this.value && this.placeholder) {
+          return this.placeholder;
+        } else {
+          return '';
         }
-      })
-    ]);
-  }
+      },
+    },
 };
 
 var localTable = {
   template: '#tab',
   components: {
-    Textfield
+    Textfield,
   },
   props: ['value'],
   name: 'local-table',
   computed: {
     list: {
         get() {
-            console.log("get")
-            return this.value
+          console.log('get');
+          return this.value;
         },
+
         set(value) {
-            console.log("set")
-            this.$emit('input', value)
-        }
-    }
-	}
+          console.log('set');
+          this.$emit('input', value);
+        },
+      },
+  },
+  methods: {
+    highlighter: function (e) {
+      console.log('highlighted', e);
+    },
+  },
 };
 
-function getRenderer(){
+function getRenderer() {
   var renderer = new THREE.WebGLRenderer({
-                        canvas: document.getElementById("renderer"),
+                        canvas: document.getElementById('renderer'),
                         antialias: true, // to get smoother output
                         preserveDrawingBuffer: true, // to allow screenshot
-                        alpha: true
+                        alpha: true,
                       });
   renderer.setClearColor(0xffffff, 0);
   renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
   renderer.autoClear = false;
-  return renderer
+  return renderer;
 }
-
 
 var app = new Vue({
   el: '#app',
   components: {
-  	localTable:localTable,
-    Textfield: Textfield
+    localTable: localTable,
+    Textfield: Textfield,
   },
   data: {
     message: 'Loading...',
-    abstract: "Loading..",
-    authors: "Loading..",
+    abstract: 'Loading..',
+    authors: 'Loading..',
     experiments: [],
-    renderer: null
+    renderer: null,
   },
   watch: {
-    experiments: function(){
-      console.log("exp changed")
-    }
+    experiments: function () {
+      console.log('exp changed');
+    },
   },
-  mounted: function(){
-    this.renderer = getRenderer()
+  mounted: function () {
+    this.renderer = getRenderer();
+    this.animate();
   },
-  methods:{
-    animate: function(){
-      var canvas=$("#renderer")[0]//$("#3d")[0];
+
+  methods: {
+    animate: function () {
+      var canvas = $('#renderer')[0];//$("#3d")[0];
       var width = canvas.clientWidth;
       var height = canvas.clientHeight;
 
       if (canvas.width !== width || canvas.height != height) {
-          this.renderer.setSize ( width, height, false );
+        this.renderer.setSize(width, height, false);
       }
+
       // render
       this.renderer.setClearColor(0xffffff, 0);
       this.renderer.clear(true);
       this.renderer.enableScissorTest(true);
 
-      this.$children.forEach(function(item, idx, arr){
-        if ("brain" in item){
-          item.brain.render()
+      this.$children.forEach(function (item, idx, arr) {
+        if ('brain' in item) {
+          item.brain.render();
         }
-      })
-      /*for (i in exp) {
-          if(exp[i].render) {
-              render(exp[i]);
-          }
-      }*/
-      //console.log("this is", this)
+      });
 
       this.renderer.enableScissorTest(false);
 
       requestAnimationFrame(this.animate.bind(this));
-    }
-  }
-})
+    },
+  },
+});
 
-
-var id = 19619662 //19892766 //17566765
+var id = 19619662; //19892766 //17566765
 $($.ajax({
-            type: "GET",
-            url: "http://localhost:5000/json/article?pmid="+id
-        }).complete(function(o) { // MAIN INIT
+            type: 'GET',
+            url: 'http://brainspell.herokuapp.com/json/article?pmid=' + id,
+          }).complete(function (o) { // MAIN INIT
               var j = o.responseText;
-              //console.log(j);
+
               var obj = JSON.parse(j);
-              console.log(obj)
-              app.message = obj.title
-              app.authors = obj.authors
-              app.abstract = obj.abstract
+              console.log(obj);
+              app.message = obj.title;
+              app.authors = obj.authors;
+              app.abstract = obj.abstract;
 
-              obj.experiments = JSON.parse(obj.experiments)
-              obj.experiments.forEach(function(obj, idx, arr){
-                arr[idx].locations = _.map(obj.locations, function(loc){
-                  var coords = loc.split(",")
-                  return {"x": parseFloat(coords[0]),
-                          "y": parseFloat(coords[1]),
-                          "z": parseFloat(coords[2])}
-                })
-                arr[idx]["canvas_id"] = "canvas"+idx
-                arr[idx]["table_id"] = "table"+idx
-              })
+              obj.experiments = JSON.parse(obj.experiments);
+              obj.experiments.forEach(function (obj, idx, arr) {
+                arr[idx].locations = _.map(obj.locations, function (loc) {
+                  var coords = loc.split(',');
+                  return { x: parseFloat(coords[0]),
+                          y: parseFloat(coords[1]),
+                          z: parseFloat(coords[2]), };
+                });
 
-              app.experiments = _.filter(obj.experiments, function(v){
-                return v.locations.length? true: false
-              })
+                arr[idx].canvas_id = 'canvas' + idx;
+                arr[idx].table_id = 'table' + idx;
+              });
+
+              app.experiments = _.filter(obj.experiments, function (v) {
+                return v.locations.length ? true : false;
+              });
+
               //obj.metadata = JSON.parse(obj.metadata)
-            })
+            }),
 
-
-  )
-
-
+  );
 
 </script>
 </html>
