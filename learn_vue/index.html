@@ -54,11 +54,7 @@
         </div>
          <div class="row">
            <brain-widget :id="exp.id" :locations="exp.locations" :canvasid="exp.canvas_id" :tableid="exp.table_id" :renderer="renderer"></brain-widget>
-           <div class="col-md-8">
-             <div class="row">
-               <local-table v-model="exp.locations"></local-table>
-             </div>
-           </div>
+
 
          </div>
       </div>
@@ -94,10 +90,10 @@
         </thead>
         <draggable v-model="list" :element="'tbody'">
           <tr v-for="(person, index) in list" :key="person" v-on:mouseover="highlighter(person)">
-            <td> <Textfield v-model="person.x" :obj="person" :index="index" keyName="x"></Textfield></td>
-            <td> <Textfield v-model="person.y" :obj="person" :index="index" keyName="y"></Textfield></td>
-            <td> <Textfield v-model="person.z" :obj="person" :index="index" keyName="z"></Textfield></td>
-            <td> <Textfield v-model="person.Z_eff" :obj="person" :index="index" keyName="Z_eff"></Textfield></td>
+            <td> <Textfield v-model="person.x" :updateFunc="setValue"></Textfield></td>
+            <td> <Textfield v-model="person.y" :updateFunc="setValue"></Textfield></td>
+            <td> <Textfield v-model="person.z" :updateFunc="setValue"></Textfield></td>
+            <td> <Textfield v-model="person.Z_eff"></Textfield></td>
             <td>
               <button type="button" class="btn btn-danger" aria-label="Left Align">
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
@@ -121,11 +117,22 @@
 
 
 Vue.component('brain-widget', {
-  template: `<div class="col-md-4">
-              <div v-bind:id="id" class="brainWidget"></div>
+  template: `
+            <div>
+              <div class="col-md-4">
+                <div v-bind:id="id" class="brainWidget"></div>
 
-              <div class="col-md-8" v-bind:id="tableid"></div>
-             </div>`,
+                <div class="col-md-8" v-bind:id="tableid"></div>
+               </div>
+
+               <div class="col-md-8">
+                 <div class="row">
+                   <local-table v-model="locations" :updater="updatePoints"></local-table>
+                 </div>
+               </div>
+             </div>
+
+             `,
   props: ['id', 'locations', 'canvasid', 'tableid', 'renderer'],
   data: function () {
     return {
@@ -144,6 +151,13 @@ Vue.component('brain-widget', {
       deep: false, //set this to true and you loop forever
     },
   },
+
+  methods: {
+    updatePoints: function () {
+      this.brain.updateSpheres();
+    },
+  },
+
   created: function () {
     console.log('creating');
   },
@@ -164,7 +178,7 @@ Vue.component('brain-widget', {
 });
 
 const Textfield = {
-  props: ['value', 'placeholder', 'keyName', 'obj', 'index'],
+  props: ['value', 'placeholder', 'keyName', 'obj', 'index', 'updateFunc', 'arr'],
   template: `
   <div class="textfield">
     <input :value="value" :placeholder="getPlaceholder()" v-on:input="onInput" type="text">
@@ -176,6 +190,10 @@ const Textfield = {
 
         //Add this line
         this.$emit('input', value);
+        if (this.updateFunc) {
+          this.updateFunc();
+        }
+
       },
 
       getPlaceholder() {
@@ -188,12 +206,12 @@ const Textfield = {
     },
 };
 
-var localTable = {
+Vue.component('local-table', {
   template: '#tab',
   components: {
     Textfield,
   },
-  props: ['value'],
+  props: ['value', 'updater'],
   name: 'local-table',
   computed: {
     list: {
@@ -203,7 +221,7 @@ var localTable = {
         },
 
         set(value) {
-          console.log('set');
+          console.log('set', value);
           this.$emit('input', value);
         },
       },
@@ -212,8 +230,12 @@ var localTable = {
     highlighter: function (e) {
       //console.log('highlighted', e);
     },
+
+    setValue: function (arr) {
+      this.updater();
+    },
   },
-};
+});
 
 function getRenderer() {
   var renderer = new THREE.WebGLRenderer({
@@ -231,7 +253,7 @@ function getRenderer() {
 var app = new Vue({
   el: '#app',
   components: {
-    localTable: localTable,
+    //localTable: localTable,
     Textfield: Textfield,
   },
   data: {
