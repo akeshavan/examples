@@ -1,8 +1,8 @@
 var app = new Vue({
   el: '.app',
   data: {
-    base_file: 'https://s3-us-west-2.amazonaws.com/akeshavan-mindcontrol/mindcontrol_freesurfer/sub86665-sub86665-000-MPRAGE__t1.nii.gz?dl=1',
-    mask_file: 'https://s3-us-west-2.amazonaws.com/akeshavan-mindcontrol/mindcontrol_freesurfer/sub86665-sub86665-000-MPRAGE__segmentation.nii.gz?dl=1',
+    base_file: 'https://firebasestorage.googleapis.com/v0/b/my-test-project-aa983.appspot.com/o/base000.nii.gz?alt=media&token=7f296b88-3696-42c0-bfff-5a7c92ce91ce',
+    mask_file: 'https://firebasestorage.googleapis.com/v0/b/my-test-project-aa983.appspot.com/o/mask000.nii.gz?alt=media&token=c80845a4-dcef-4a94-a87e-e74b18d9642b',
     slice_direction: 'ax',
     mask_threshold: 10000,
     request: '',
