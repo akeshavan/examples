@@ -4,7 +4,7 @@ var app = new Vue({
     base_file: 'https://firebasestorage.googleapis.com/v0/b/my-test-project-aa983.appspot.com/o/base000.nii.gz?alt=media&token=7f296b88-3696-42c0-bfff-5a7c92ce91ce',
     mask_file: 'https://firebasestorage.googleapis.com/v0/b/my-test-project-aa983.appspot.com/o/mask000.nii.gz?alt=media&token=c80845a4-dcef-4a94-a87e-e74b18d9642b',
     slice_direction: 'ax',
-    mask_threshold: 10000,
+    mask_threshold: 10,
     request: '',
     data: [],
     log: [],
