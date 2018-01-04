@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Serverless Tiles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+<link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css'>
+
+      <link rel="stylesheet" href="css/style.css">
+
+  
+</head>
+
+<body>
+
+  <div class="container fluid app">
+  <h1 class="heading">Data Converter</h1>
+  <p class="lead muted">Convert 3D data from imaging data to 2D slices</p>
+
+  <form class="data-form">
+    <div class="form-group">
+      <label for="exampleInputEmail1">Base URL <span class="required"> * </span> </label>
+      <input type="text" class="form-control" id="base_image" aria-describedby="baseURLHelp" placeholder="Enter Base URL" v-model="base_file">
+      <small id="baseURLHelp" class="form-text text-muted">This is a URL to the main nifti image you wish to segment</small>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputPassword1">Mask URL
+      </label>
+      <input type="text" class="form-control" id="mask_image" placeholder="Enter Mask URL" describedby="maskHelp" v-model="mask_file">
+            <small id="maskHelp" class="form-text text-muted">(Optional) This is a URL to a mask image. Leave blank to threshold base image</small>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputthreshold">Mask Threshold
+      </label>
+      <input type="text" class="form-control" id="mask_threshold" placeholder="Enter Mask Threshold" describedby="maskThreshold" v-model="mask_threshold">
+            <small id="maskThreshold" class="form-text text-muted">The minimum # voxels in the mask. If less than the threshold, the tile will not be created.</small>
+    </div>
+    <div class="form-group">
+      <label for="slice_direction">Slice Direction
+      <span class="required"> * </span>
+        
+      </label>
+      <select class="form-control" id="slice_direction" v-model="slice_direction">
+        <option>ax</option>
+        <option>sag</option>
+        <option>cor</option>
+      </select>
+       <small id="maskHelp" class="form-text text-muted">Slice the images on the axial (ax) sagittal (sag) or coronal (cor) plane</small>
+    </div>
+    <button type="button" class="btn btn-primary" v-on:click="submitForm">
+      <span v-if="status">Submit </span>
+      <i v-if="!status" class="fa fa-circle-o-notch fa-spin  fa-fw"></i>
+</button>
+  </form>
+  
+  <div class="alert alert-danger" role="alert" v-if="error">
+    Something went wrong!
+  </div>
+
+  <div class="row text-center text-lg-left">
+
+        <div class="col-lg-3 col-md-4 col-xs-6" v-for="d in data">
+            <img class="img-fluid img-thumbnail" v-bind:src="'data:image/jpeg;base64,'+d.pic" alt="">
+        </div>
+  </div>
+  
+</div>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/js/bootstrap.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.3/vue.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.1/axios.js'></script>
+
+  
+
+    <script  src="js/index.js"></script>
+
+
+
+
+</body>
+
+</html>

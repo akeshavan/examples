@@ -1,0 +1,16 @@
+.heading {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.lead {
+  text-align: center;
+}
+
+.required {
+  color: red;
+}
+
+.data-form {
+  margin-bottom: 40px;
+}
