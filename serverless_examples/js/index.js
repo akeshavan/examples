@@ -4,7 +4,7 @@ var app = new Vue({
     base_file: 'https://s3-us-west-2.amazonaws.com/akeshavan-mindcontrol/mindcontrol_freesurfer/sub86665-sub86665-000-MPRAGE__t1.nii.gz?dl=1',
     mask_file: 'https://s3-us-west-2.amazonaws.com/akeshavan-mindcontrol/mindcontrol_freesurfer/sub86665-sub86665-000-MPRAGE__segmentation.nii.gz?dl=1',
     slice_direction: 'ax',
-    mask_threshold: 100,
+    mask_threshold: 10000,
     request: '',
     data: [],
     log: [],
